@@ -10,7 +10,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -18,14 +17,13 @@ import androidx.compose.ui.unit.sp
 internal fun RoleBadge(label: String, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
-            .clip(RoundedCornerShape(ClaramenteRadius.Pill))
-            .background(ClaramenteColors.BerryMist)
-            .padding(horizontal = 14.dp, vertical = 6.dp),
+            .background(ClaramenteColors.SurfaceMuted, RoundedCornerShape(ClaramenteRadius.Sm))
+            .padding(horizontal = 10.dp, vertical = 4.dp),
     ) {
         Text(
             label,
             style = MaterialTheme.typography.labelMedium.copy(fontSize = 12.sp),
-            color = ClaramenteColors.BerryDeep,
+            color = ClaramenteColors.TextSecondary,
         )
     }
 }

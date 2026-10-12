@@ -9,7 +9,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -42,47 +41,40 @@ fun PrimaryButton(
     val pressed by interactionSource.collectIsPressedAsState()
     val active = enabled && !loading
     val shape = RoundedCornerShape(ClaramenteRadius.Md)
-    val shadowColor = if (pressed) Color.Transparent else tone.deep
-    val surfaceOffset = if (pressed) 3.dp else 0.dp
+    val base = containerColor ?: tone.main
+    val background = when {
+        !pressed -> base
+        containerColor != null -> base.copy(alpha = 0.88f)
+        else -> tone.deep
+    }
     Box(
-        modifier = modifier.graphicsLayer { alpha = if (active) 1f else 0.6f },
-        propagateMinConstraints = true,
+        modifier = modifier
+            .graphicsLayer { alpha = if (active) 1f else 0.5f }
+            .clip(shape)
+            .background(background)
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null,
+                enabled = active,
+                role = Role.Button,
+                onClick = onClick,
+            )
+            .defaultMinSize(minHeight = 52.dp)
+            .padding(horizontal = 24.dp),
+        contentAlignment = Alignment.Center,
     ) {
-        Box(
-            modifier = Modifier
-                .matchParentSize()
-                .offset(y = 4.dp)
-                .background(shadowColor, shape),
-        )
-        Box(
-            modifier = Modifier
-                .offset(y = surfaceOffset)
-                .clip(shape)
-                .background(containerColor ?: tone.main)
-                .clickable(
-                    interactionSource = interactionSource,
-                    indication = null,
-                    enabled = active,
-                    role = Role.Button,
-                    onClick = onClick,
-                )
-                .defaultMinSize(minHeight = 50.dp)
-                .padding(horizontal = 26.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            if (loading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(20.dp),
-                    color = ClaramenteColors.White,
-                    strokeWidth = 2.dp,
-                )
-            } else {
-                Text(
-                    text = text,
-                    style = MaterialTheme.typography.labelLarge,
-                    color = textColor ?: ClaramenteColors.White,
-                )
-            }
+        if (loading) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(20.dp),
+                color = textColor ?: ClaramenteColors.White,
+                strokeWidth = 2.dp,
+            )
+        } else {
+            Text(
+                text = text,
+                style = MaterialTheme.typography.labelLarge,
+                color = textColor ?: ClaramenteColors.White,
+            )
         }
     }
 }

@@ -39,7 +39,7 @@ internal fun ArBottomBar(state: ArExperienceUiState, actions: ArExperienceAction
                 else -> "Procurando o alvo..."
             }
             val background = if (state.found) {
-                ClaramenteColors.Sprout.copy(alpha = 0.92f)
+                ClaramenteColors.Success.copy(alpha = 0.92f)
             } else {
                 ClaramenteColors.InkDeep.copy(alpha = 0.82f)
             }

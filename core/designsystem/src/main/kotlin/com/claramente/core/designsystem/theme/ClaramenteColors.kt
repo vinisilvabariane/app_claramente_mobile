@@ -4,44 +4,45 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 
 object ClaramenteColors {
-    val Ink = Color(0xFF0B3B57)
-    val InkDeep = Color(0xFF062A40)
-    val Sky = Color(0xFF2FB6D9)
-    val SkyDeep = Color(0xFF1B8FAE)
-    val SkyMist = Color(0xFFE4F6FA)
-    val Sun = Color(0xFFFF9224)
-    val SunDeep = Color(0xFFDB6E00)
-    val SunMist = Color(0xFFFFEEDD)
-    val Sprout = Color(0xFF46C26E)
-    val SproutDeep = Color(0xFF2E9E52)
-    val SproutMist = Color(0xFFE4F8EA)
-    val Berry = Color(0xFF7C5CFF)
-    val BerryDeep = Color(0xFF5B3FE0)
-    val BerryMist = Color(0xFFEEEAFF)
-    val Cream = Color(0xFFFFF9EF)
-    val TextSecondary = Color(0xFF5B7182)
+    val Ink = Color(0xFF0F1B2D)
+    val InkDeep = Color(0xFF0A1322)
+    val TextSecondary = Color(0xFF566173)
+    val TextTertiary = Color(0xFF8A94A3)
+    val Background = Color(0xFFF5F7FA)
     val White = Color(0xFFFFFFFF)
-    val TabInactive = Color(0xFF9AA7AF)
-    val FieldBorder = Color(0xFFE5EBEE)
-    val FieldFill = Color(0xFFF4F7F9)
-    val NeutralBorder = Color(0xFFE5EBEE)
-    val NeutralBorderDeep = Color(0xFFCFD8DD)
-    val ErrorFill = Color(0xFFFDECEA)
-    val ErrorText = Color(0xFFB3261E)
-    val Overlay = Color(0x06, 0x2A, 0x40, 0xB8)
+    val SurfaceMuted = Color(0xFFEEF1F5)
+    val Border = Color(0xFFE3E7ED)
+    val BorderStrong = Color(0xFFCDD3DC)
+    val Primary = Color(0xFF1F6FE5)
+    val PrimaryDeep = Color(0xFF1655BD)
+    val PrimaryMist = Color(0xFFEAF1FD)
+    val Success = Color(0xFF1F8A57)
+    val SuccessMist = Color(0xFFE6F4EC)
+    val Warning = Color(0xFFA86400)
+    val WarningMist = Color(0xFFFCF1DE)
+    val Violet = Color(0xFF6447D1)
+    val VioletMist = Color(0xFFEFEBFB)
+    val TabInactive = Color(0xFF8A94A3)
+    val FieldFill = Color(0xFFFFFFFF)
+    val FieldBorder = Color(0xFFCDD3DC)
+    val ErrorFill = Color(0xFFFDECEC)
+    val ErrorBorder = Color(0xFFF5C2C0)
+    val ErrorText = Color(0xFFB42318)
+    val ErrorDeep = Color(0xFF8F1C13)
+    val Overlay = Color(0x0A, 0x13, 0x22, 0xC7)
 
     internal val LightScheme = lightColorScheme(
-        primary = Sky,
+        primary = Primary,
         onPrimary = White,
-        secondary = Sprout,
+        secondary = Ink,
         onSecondary = White,
-        tertiary = Sun,
-        background = Cream,
+        tertiary = Violet,
+        background = Background,
         onBackground = Ink,
         surface = White,
         onSurface = Ink,
         onSurfaceVariant = TextSecondary,
-        outline = FieldBorder,
+        outline = Border,
         error = ErrorText,
     )
 }

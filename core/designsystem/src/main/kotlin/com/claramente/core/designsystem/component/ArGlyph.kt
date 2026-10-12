@@ -17,24 +17,24 @@ import androidx.compose.ui.unit.dp
 fun ArGlyph(color: Color, modifier: Modifier = Modifier.size(24.dp)) {
     Canvas(modifier) {
         scale(size.minDimension / 24f, Offset.Zero) {
-            val stroke = Stroke(width = 2.4f, cap = StrokeCap.Round, join = StrokeJoin.Round)
+            val stroke = Stroke(width = 2f, cap = StrokeCap.Round, join = StrokeJoin.Round)
             val top = Path().apply {
-                moveTo(7f, 8.2f)
-                lineTo(12f, 5f)
-                lineTo(17f, 8.2f)
-                lineTo(12f, 11.4f)
+                moveTo(4.5f, 7.5f)
+                lineTo(12f, 3.2f)
+                lineTo(19.5f, 7.5f)
+                lineTo(12f, 11.8f)
                 close()
             }
             val sides = Path().apply {
-                moveTo(7f, 8.2f)
-                lineTo(7f, 14.4f)
-                lineTo(12f, 17.6f)
-                lineTo(17f, 14.4f)
-                lineTo(17f, 8.2f)
+                moveTo(4.5f, 7.5f)
+                lineTo(4.5f, 16.5f)
+                lineTo(12f, 20.8f)
+                lineTo(19.5f, 16.5f)
+                lineTo(19.5f, 7.5f)
             }
             val edge = Path().apply {
-                moveTo(12f, 11.4f)
-                lineTo(12f, 17.6f)
+                moveTo(12f, 11.8f)
+                lineTo(12f, 20.8f)
             }
             drawPath(top, color, style = stroke)
             drawPath(sides, color, style = stroke)

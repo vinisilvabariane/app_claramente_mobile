@@ -1,8 +1,7 @@
 package com.claramente.feature.ar.view
 
-import com.claramente.core.designsystem.component.OutlinedPillButton
+import com.claramente.core.designsystem.component.SecondaryButton
 import com.claramente.core.designsystem.component.PrimaryButton
-import com.claramente.core.designsystem.theme.ButtonTone
 import com.claramente.core.designsystem.theme.ClaramenteColors
 import com.claramente.feature.ar.component.ArFootnote
 import com.claramente.feature.ar.component.ArHeader
@@ -35,7 +34,7 @@ fun ArScreen(state: ArUiState, actions: ArActions) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(ClaramenteColors.Cream)
+            .background(ClaramenteColors.Background)
             .statusBarsPadding()
             .verticalScroll(rememberScrollState()),
         contentAlignment = Alignment.TopCenter,
@@ -50,7 +49,7 @@ fun ArScreen(state: ArUiState, actions: ArActions) {
             ArHeader()
             Column {
                 Text(
-                    text = "Escolha o conteúdo",
+                    text = "Modelos",
                     style = MaterialTheme.typography.titleMedium,
                     color = ClaramenteColors.Ink,
                     modifier = Modifier.padding(bottom = 12.dp),
@@ -67,7 +66,7 @@ fun ArScreen(state: ArUiState, actions: ArActions) {
             }
             Column {
                 Text(
-                    text = "Como você quer ver?",
+                    text = "Modo de visualização",
                     style = MaterialTheme.typography.titleMedium,
                     color = ClaramenteColors.Ink,
                     modifier = Modifier.padding(bottom = 12.dp),
@@ -81,18 +80,17 @@ fun ArScreen(state: ArUiState, actions: ArActions) {
                 )
             }
             Column(
-                verticalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 PrimaryButton(
-                    text = if (state.mode == ArMode.QR) "Ler QR code em AR" else "Abrir ${state.selected.title} em AR",
+                    text = if (state.mode == ArMode.QR) "Ler QR code em AR" else "Abrir ${state.selected.title}",
                     onClick = actions.onStart,
                     modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp),
-                    tone = ButtonTone.SUCCESS,
                 )
                 if (state.arWebUrl != null) {
-                    OutlinedPillButton(text = "Abrir versão web", onClick = actions.onOpenWeb)
+                    SecondaryButton(text = "Abrir versão web", onClick = actions.onOpenWeb, modifier = Modifier.fillMaxWidth())
                 }
             }
             ArFootnote()

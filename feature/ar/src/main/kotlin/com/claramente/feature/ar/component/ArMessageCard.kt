@@ -1,7 +1,6 @@
 package com.claramente.feature.ar.component
 
 import com.claramente.core.designsystem.component.PrimaryButton
-import com.claramente.core.designsystem.theme.ButtonTone
 import com.claramente.core.designsystem.theme.ClaramenteColors
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -32,7 +31,7 @@ internal fun ArMessageCard(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(ClaramenteColors.Cream)
+            .background(ClaramenteColors.Background)
             .padding(28.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically),
@@ -51,11 +50,11 @@ internal fun ArMessageCard(
             modifier = Modifier.widthIn(max = 340.dp).padding(bottom = 8.dp),
         )
         if (primaryLabel != null) {
-            PrimaryButton(text = primaryLabel, onClick = onPrimary, tone = ButtonTone.SUCCESS)
+            PrimaryButton(text = primaryLabel, onClick = onPrimary)
         }
         if (secondaryLabel != null) {
             TextButton(onClick = onSecondary) {
-                Text(secondaryLabel, color = ClaramenteColors.Sky, style = MaterialTheme.typography.labelLarge)
+                Text(secondaryLabel, color = ClaramenteColors.Primary, style = MaterialTheme.typography.labelLarge)
             }
         }
         TextButton(onClick = onBack) {

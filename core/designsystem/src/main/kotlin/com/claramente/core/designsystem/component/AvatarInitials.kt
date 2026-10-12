@@ -1,4 +1,4 @@
-package com.claramente.feature.profile.component
+package com.claramente.core.designsystem.component
 
 import com.claramente.core.designsystem.theme.ClaramenteColors
 import androidx.compose.foundation.background
@@ -11,22 +11,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-internal fun ProfileAvatar(initials: String, modifier: Modifier = Modifier) {
+fun AvatarInitials(initials: String, modifier: Modifier = Modifier, size: Dp = 44.dp) {
     Box(
         modifier = modifier
-            .size(72.dp)
+            .size(size)
             .clip(CircleShape)
-            .background(ClaramenteColors.Berry),
+            .background(ClaramenteColors.PrimaryMist),
         contentAlignment = Alignment.Center,
     ) {
         Text(
-            initials,
-            style = MaterialTheme.typography.headlineMedium.copy(fontSize = 26.sp),
-            color = ClaramenteColors.White,
+            text = initials,
+            style = MaterialTheme.typography.titleMedium.copy(fontSize = (size.value * 0.36f).sp),
+            color = ClaramenteColors.PrimaryDeep,
         )
     }
 }

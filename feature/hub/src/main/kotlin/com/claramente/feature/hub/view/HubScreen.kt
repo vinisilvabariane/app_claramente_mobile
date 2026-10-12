@@ -5,12 +5,18 @@ import com.claramente.core.designsystem.theme.ClaramenteColors
 import com.claramente.feature.hub.component.ContinueCard
 import com.claramente.feature.hub.component.FeedCard
 import com.claramente.feature.hub.component.HubHeader
+import com.claramente.feature.hub.component.StatTile
 import com.claramente.feature.hub.state.FeedItem
+import com.claramente.feature.hub.state.HubStat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.widthIn
@@ -24,11 +30,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun HubScreen(user: UserSession?, feed: List<FeedItem>, onContinue: () -> Unit) {
+fun HubScreen(user: UserSession?, stats: List<HubStat>, feed: List<FeedItem>, onContinue: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(ClaramenteColors.Cream)
+            .background(ClaramenteColors.Background)
             .statusBarsPadding()
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -37,19 +43,35 @@ fun HubScreen(user: UserSession?, feed: List<FeedItem>, onContinue: () -> Unit) 
             modifier = Modifier
                 .widthIn(max = 760.dp)
                 .fillMaxWidth()
-                .padding(20.dp),
+                .padding(horizontal = 20.dp, vertical = 20.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp),
         ) {
-            HubHeader(firstName = user?.firstName ?: "Você")
+            HubHeader(firstName = user?.firstName ?: "estudante", initials = user?.initials ?: "?")
             ContinueCard(onContinue = onContinue)
             Column {
                 Text(
-                    "Novidades da sua turma",
+                    "Sua semana",
                     style = MaterialTheme.typography.titleMedium,
                     color = ClaramenteColors.Ink,
                     modifier = Modifier.padding(bottom = 12.dp),
                 )
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                    stats.forEach { stat ->
+                        StatTile(stat = stat, modifier = Modifier.weight(1f).fillMaxHeight())
+                    }
+                }
+            }
+            Column {
+                Text(
+                    "Mural da turma",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = ClaramenteColors.Ink,
+                    modifier = Modifier.padding(bottom = 12.dp),
+                )
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     feed.forEach { item -> FeedCard(item = item) }
                 }
             }

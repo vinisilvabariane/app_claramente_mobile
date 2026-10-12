@@ -14,9 +14,9 @@ fun LoadingScreen(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(ClaramenteColors.Cream),
+            .background(ClaramenteColors.Background),
         contentAlignment = Alignment.Center,
     ) {
-        CircularProgressIndicator(color = ClaramenteColors.Sky)
+        CircularProgressIndicator(color = ClaramenteColors.Primary)
     }
 }

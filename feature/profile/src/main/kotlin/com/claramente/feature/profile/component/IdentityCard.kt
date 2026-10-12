@@ -1,11 +1,13 @@
 package com.claramente.feature.profile.component
 
 import com.claramente.core.auth.model.UserSession
-import com.claramente.core.designsystem.component.ChunkyCard
+import com.claramente.core.designsystem.component.AvatarInitials
+import com.claramente.core.designsystem.component.BrandCard
 import com.claramente.core.designsystem.theme.ClaramenteColors
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -17,35 +19,29 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 internal fun IdentityCard(user: UserSession?) {
-    ChunkyCard(
-        color = ClaramenteColors.Berry,
-        deep = ClaramenteColors.BerryDeep,
-        modifier = Modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(horizontal = 18.dp, vertical = 28.dp),
-    ) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(6.dp),
+    BrandCard(modifier = Modifier.fillMaxWidth(), contentPadding = PaddingValues(18.dp)) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            ProfileAvatar(
-                initials = user?.initials ?: "?",
-                modifier = Modifier.padding(bottom = 4.dp),
-            )
-            Text(
-                user?.name?.takeIf { it.isNotBlank() } ?: "Explorador(a)",
-                style = MaterialTheme.typography.titleLarge,
-                color = ClaramenteColors.Ink,
-            )
-            user?.email?.takeIf { it.isNotBlank() }?.let { email ->
+            AvatarInitials(initials = user?.initials ?: "?", size = 60.dp)
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    email,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = ClaramenteColors.TextSecondary,
+                    user?.name?.takeIf { it.isNotBlank() } ?: "Estudante",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = ClaramenteColors.Ink,
                 )
-            }
-            user?.rolesLabel?.let { roles ->
-                RoleBadge(label = roles, modifier = Modifier.padding(top = 8.dp))
+                user?.email?.takeIf { it.isNotBlank() }?.let { email ->
+                    Text(
+                        email,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = ClaramenteColors.TextSecondary,
+                        modifier = Modifier.padding(top = 2.dp),
+                    )
+                }
+                user?.rolesLabel?.let { roles ->
+                    RoleBadge(label = roles, modifier = Modifier.padding(top = 10.dp))
+                }
             }
         }
     }

@@ -1,68 +1,56 @@
 package com.claramente.feature.login.component
 
+import com.claramente.core.designsystem.component.BrandCard
 import com.claramente.core.designsystem.component.BrandTextField
 import com.claramente.core.designsystem.component.PrimaryButton
-import com.claramente.core.designsystem.theme.ButtonTone
 import com.claramente.core.designsystem.theme.ClaramenteColors
 import com.claramente.feature.login.state.LoginActions
 import com.claramente.feature.login.state.LoginUiState
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 @Composable
 internal fun LoginCard(state: LoginUiState, actions: LoginActions, modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier
-            .background(ClaramenteColors.Cream, RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp))
-            .navigationBarsPadding()
-            .padding(start = 28.dp, end = 28.dp, top = 32.dp, bottom = 28.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
+    BrandCard(modifier = modifier, contentPadding = PaddingValues(20.dp)) {
         Text(
-            text = "Login",
-            style = MaterialTheme.typography.headlineMedium,
-            color = ClaramenteColors.Sky,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth(),
+            text = "Entrar",
+            style = MaterialTheme.typography.headlineSmall,
+            color = ClaramenteColors.Ink,
         )
         Text(
-            text = "Preencha seus dados para começar.",
+            text = "Use o e-mail e a senha cadastrados pela sua escola.",
             style = MaterialTheme.typography.bodyMedium,
             color = ClaramenteColors.TextSecondary,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth().padding(top = 4.dp, bottom = 24.dp),
+            modifier = Modifier.padding(top = 4.dp, bottom = 20.dp),
         )
         Column(
-            modifier = Modifier.widthIn(max = 420.dp).fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             state.error?.let { LoginErrorBox(message = it) }
             BrandTextField(
                 value = state.email,
                 onValueChange = actions.onEmail,
-                placeholder = "E-mail",
+                label = "E-mail",
+                placeholder = "nome@escola.com.br",
                 modifier = Modifier.fillMaxWidth(),
                 keyboardType = KeyboardType.Email,
             )
             BrandTextField(
                 value = state.password,
                 onValueChange = actions.onPassword,
-                placeholder = "Senha",
+                label = "Senha",
+                placeholder = "Sua senha",
                 modifier = Modifier.fillMaxWidth(),
                 keyboardType = KeyboardType.Password,
                 password = true,
@@ -72,8 +60,7 @@ internal fun LoginCard(state: LoginUiState, actions: LoginActions, modifier: Mod
             PrimaryButton(
                 text = if (state.loading) "Entrando..." else "Entrar",
                 onClick = actions.onSubmit,
-                modifier = Modifier.fillMaxWidth().padding(top = 6.dp),
-                tone = ButtonTone.SUCCESS,
+                modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
                 enabled = state.canSubmit,
                 loading = state.loading,
             )

@@ -111,16 +111,19 @@ View (Composable) ──► ViewModel / Controller ──► I*UseCase ──►
 - Parsing de JSON só em `mapper/`.
 - Sufixos proibidos: `Manager`, `Util`, `Utils`, `Helper` (como nome de classe), `Impl`, `Service`
   fora de `service/`.
-- Código em inglês, textos de tela em português (iguais aos do app React), sem comentários.
+- Código em inglês, textos de tela em português, sem comentários.
 
 ## 8. Interface
 
-- Compose Material 3 + Foundation, sem biblioteca de ícones: glyphs e mascote são desenhados em
-  `Canvas` (`HomeGlyph`, `ProfileGlyph`, `ArGlyph`, `MascotPainter`).
+- Público-alvo: estudantes do ensino médio. Visual sóbrio de app de estudos: superfícies planas
+  com borda fina (`BrandCard`), um único azul de destaque (`Primary`), fonte única Nunito Sans,
+  sem mascote, sem sombras deslocadas "de bala" e sem textos infantilizados. Desde 2026-10-06 o
+  visual não espelha mais o app React.
+- Compose Material 3 + Foundation, sem biblioteca de ícones: glyphs e a marca são desenhados em
+  `Canvas` (`HomeGlyph`, `ProfileGlyph`, `ArGlyph`, `BrandMark`).
 - Cores, fontes, raios e curvas de movimento vêm só de `core:designsystem/theme/`
   (`ClaramenteColors`, `ClaramenteFonts`, `ClaramenteTypography`, `ClaramenteRadius`,
-  `ClaramenteMotion`); nenhuma cor literal em feature. Os tokens espelham o `theme.ts` do app
-  React 1:1, inclusive os que ainda não têm consumidor no Android.
+  `ClaramenteMotion`); nenhuma cor literal em feature.
 - O app é só claro (não há tema escuro): a `MainActivity` roda com `enableEdgeToEdge()` forçando
   `SystemBarStyle.light` nas duas barras, independentemente do modo escuro do sistema
   (`ClaramenteColors.Overlay` é o scrim da barra de navegação em API 24–25).

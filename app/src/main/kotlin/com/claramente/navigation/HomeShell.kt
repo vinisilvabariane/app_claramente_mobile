@@ -39,7 +39,7 @@ fun HomeShell(
     val currentTab = HomeTab.fromRoute(backStackEntry?.destination?.route)
 
     Scaffold(
-        containerColor = ClaramenteColors.Cream,
+        containerColor = ClaramenteColors.Background,
         contentWindowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal),
         bottomBar = {
             HomeTabBar(
@@ -62,7 +62,7 @@ fun HomeShell(
                 .padding(padding),
         ) {
             composable(Routes.HUB) {
-                HubScreen(user = session.user, feed = HubFeed.items, onContinue = {})
+                HubScreen(user = session.user, stats = HubFeed.stats, feed = HubFeed.items, onContinue = {})
             }
             composable(Routes.PROFILE) {
                 ProfileScreen(user = session.user, loggingOut = session.loggingOut, onLogout = onLogout)

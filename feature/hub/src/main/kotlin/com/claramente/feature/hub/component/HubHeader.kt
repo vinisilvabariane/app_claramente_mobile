@@ -1,11 +1,8 @@
 package com.claramente.feature.hub.component
 
+import com.claramente.core.designsystem.component.AvatarInitials
 import com.claramente.core.designsystem.component.Eyebrow
-import com.claramente.core.designsystem.component.FloatY
-import com.claramente.core.designsystem.component.Mascot
-import com.claramente.core.designsystem.state.MascotPose
 import com.claramente.core.designsystem.theme.ClaramenteColors
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,23 +15,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-internal fun HubHeader(firstName: String) {
+internal fun HubHeader(firstName: String, initials: String) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.Top,
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Eyebrow(text = "INÍCIO")
+            Eyebrow(text = "Painel do estudante")
             Text(
-                "Bom te ver, $firstName.",
+                "Olá, $firstName",
                 style = MaterialTheme.typography.headlineMedium,
                 color = ClaramenteColors.Ink,
-                modifier = Modifier.padding(top = 2.dp),
+                modifier = Modifier.padding(top = 4.dp),
             )
         }
-        FloatY(distance = 3.dp, durationMs = 2200) {
-            Mascot(pose = MascotPose.HAPPY, size = 56.dp, tapReactions = true)
-        }
+        AvatarInitials(initials = initials)
     }
 }

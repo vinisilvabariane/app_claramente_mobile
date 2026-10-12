@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 fun HomeGlyph(color: Color, modifier: Modifier = Modifier.size(24.dp)) {
     Canvas(modifier) {
         scale(size.minDimension / 24f, Offset.Zero) {
-            val stroke = Stroke(width = 2.4f, cap = StrokeCap.Round, join = StrokeJoin.Round)
+            val stroke = Stroke(width = 2f, cap = StrokeCap.Round, join = StrokeJoin.Round)
             val roof = Path().apply {
                 moveTo(4f, 11.5f)
                 lineTo(12f, 4f)

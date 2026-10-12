@@ -63,7 +63,7 @@ internal fun ArOverlay(title: String, hint: String, onBack: () -> Unit, modifier
             Text(
                 text = hint,
                 style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp, lineHeight = 16.sp),
-                color = ClaramenteColors.SkyMist,
+                color = ClaramenteColors.White.copy(alpha = 0.75f),
                 modifier = Modifier.padding(top = 1.dp),
             )
         }

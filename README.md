@@ -2,8 +2,8 @@
 
 App Android nativo (Kotlin + Jetpack Compose) do Claramente. Faz login no backend .NET, restaura a
 sessão guardada no aparelho, mostra o Início (feed da turma), o Perfil e a Realidade Aumentada, que
-abre a experiência web (MindAR) no navegador do celular. Mesma interface do app React Native/Expo
-(`claramente-android`), mesma arquitetura do Iris Mobile.
+abre a experiência web (MindAR) no navegador do celular. Funcionalidades do app React Native/Expo
+(`claramente-android`) com interface própria voltada ao ensino médio, mesma arquitetura do Iris Mobile.
 
 ## Requisitos
 
@@ -94,7 +94,7 @@ core/
 ├─ data/             contract/ITokenStore, store/PrefsTokenStore
 ├─ domain/           camada de aplicação: contract/ (I*UseCase), usecase/ (*UseCase), error/ (*Errors)
 └─ designsystem/     theme/ (ClaramenteTheme, ClaramenteColors, ClaramenteTypography, ...),
-                     component/ (PrimaryButton, BrandCard, ChunkyCard, BrandTextField, Mascot, glyphs)
+                     component/ (PrimaryButton, SecondaryButton, BrandCard, BrandTextField, BrandMark, glyphs)
 feature/
 ├─ session/          state/SessionUiState, viewmodel/SessionViewModel (restaura e encerra a sessão)
 ├─ login/            view/LoginScreen, component/, state/, viewmodel/LoginViewModel

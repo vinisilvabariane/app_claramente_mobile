@@ -1,7 +1,9 @@
 package com.claramente.core.designsystem.component
 
 import com.claramente.core.designsystem.theme.ButtonTone
+import com.claramente.core.designsystem.theme.ClaramenteColors
 import com.claramente.core.designsystem.theme.ClaramenteRadius
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -23,7 +25,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun OutlinedPillButton(
+fun SecondaryButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -32,17 +34,13 @@ fun OutlinedPillButton(
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val pressed by interactionSource.collectIsPressedAsState()
-    val shape = RoundedCornerShape(ClaramenteRadius.Pill)
-    val alpha = when {
-        !enabled -> 0.5f
-        pressed -> 0.85f
-        else -> 1f
-    }
+    val shape = RoundedCornerShape(ClaramenteRadius.Md)
     Box(
         modifier = modifier
-            .alpha(alpha)
+            .alpha(if (enabled) 1f else 0.5f)
             .clip(shape)
-            .border(2.dp, tone.main, shape)
+            .background(if (pressed) ClaramenteColors.SurfaceMuted else ClaramenteColors.White)
+            .border(1.dp, ClaramenteColors.BorderStrong, shape)
             .clickable(
                 interactionSource = interactionSource,
                 indication = null,
@@ -50,8 +48,8 @@ fun OutlinedPillButton(
                 role = Role.Button,
                 onClick = onClick,
             )
-            .defaultMinSize(minHeight = 44.dp)
-            .padding(horizontal = 22.dp),
+            .defaultMinSize(minHeight = 48.dp)
+            .padding(horizontal = 20.dp),
         contentAlignment = Alignment.Center,
     ) {
         Text(

@@ -17,18 +17,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
 internal fun ArModeChip(mode: ArMode, selected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    val shape = RoundedCornerShape(ClaramenteRadius.Md)
+    val shape = RoundedCornerShape(ClaramenteRadius.Sm)
     Column(
         modifier = modifier
             .clip(shape)
-            .background(if (selected) ClaramenteColors.SkyMist else ClaramenteColors.White)
-            .border(2.dp, if (selected) ClaramenteColors.Sky else ClaramenteColors.NeutralBorder, shape)
+            .background(if (selected) ClaramenteColors.White else Color.Transparent)
+            .border(1.dp, if (selected) ClaramenteColors.Border else Color.Transparent, shape)
             .selectable(
                 selected = selected,
                 interactionSource = remember { MutableInteractionSource() },
@@ -36,19 +38,21 @@ internal fun ArModeChip(mode: ArMode, selected: Boolean, onClick: () -> Unit, mo
                 role = Role.RadioButton,
                 onClick = onClick,
             )
-            .padding(horizontal = 8.dp, vertical = 12.dp),
+            .padding(horizontal = 6.dp, vertical = 10.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
             text = mode.title,
             style = MaterialTheme.typography.labelLarge.copy(fontSize = 14.sp),
-            color = if (selected) ClaramenteColors.SkyDeep else ClaramenteColors.Ink,
+            color = if (selected) ClaramenteColors.Ink else ClaramenteColors.TextSecondary,
+            textAlign = TextAlign.Center,
         )
         Text(
             text = mode.caption,
             style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp, lineHeight = 15.sp),
-            color = ClaramenteColors.TextSecondary,
-            modifier = Modifier.padding(top = 2.dp),
+            color = ClaramenteColors.TextTertiary,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(top = 1.dp),
         )
     }
 }

@@ -17,13 +17,13 @@ import androidx.compose.ui.unit.dp
 fun ProfileGlyph(color: Color, modifier: Modifier = Modifier.size(24.dp)) {
     Canvas(modifier) {
         scale(size.minDimension / 24f, Offset.Zero) {
-            drawCircle(color, radius = 3.4f, center = Offset(12f, 8.2f), style = Stroke(width = 2.4f))
+            drawCircle(color, radius = 3.4f, center = Offset(12f, 8.2f), style = Stroke(width = 2f))
             val shoulders = Path().apply {
                 moveTo(5f, 20f)
                 cubicTo(6.1f, 16.7f, 8.9f, 15f, 12f, 15f)
                 cubicTo(15.1f, 15f, 17.9f, 16.7f, 19f, 20f)
             }
-            drawPath(shoulders, color, style = Stroke(width = 2.4f, cap = StrokeCap.Round, join = StrokeJoin.Round))
+            drawPath(shoulders, color, style = Stroke(width = 2f, cap = StrokeCap.Round, join = StrokeJoin.Round))
         }
     }
 }

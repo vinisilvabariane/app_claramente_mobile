@@ -12,6 +12,6 @@ import androidx.compose.ui.tooling.preview.Preview
 @Composable
 fun HubPreview() {
     ClaramenteTheme {
-        HubScreen(user = null, feed = HubFeed.items, onContinue = {})
+        HubScreen(user = null, stats = HubFeed.stats, feed = HubFeed.items, onContinue = {})
     }
 }

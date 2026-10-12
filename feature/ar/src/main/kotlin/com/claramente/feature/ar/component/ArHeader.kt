@@ -13,12 +13,18 @@ import androidx.compose.ui.unit.dp
 @Composable
 internal fun ArHeader(modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
-        Eyebrow(text = "REALIDADE AUMENTADA")
+        Eyebrow(text = "Laboratório · Realidade aumentada")
         Text(
-            text = "Aponte a câmera e veja em 3D.",
+            text = "Explore em 3D",
             style = MaterialTheme.typography.headlineMedium,
             color = ClaramenteColors.Ink,
-            modifier = Modifier.padding(top = 2.dp),
+            modifier = Modifier.padding(top = 4.dp),
+        )
+        Text(
+            text = "Escolha um modelo, aponte a câmera e observe o conteúdo de todos os ângulos.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = ClaramenteColors.TextSecondary,
+            modifier = Modifier.padding(top = 6.dp),
         )
     }
 }

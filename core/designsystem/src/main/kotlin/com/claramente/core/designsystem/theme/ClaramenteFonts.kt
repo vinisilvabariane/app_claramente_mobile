@@ -6,12 +6,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 
 object ClaramenteFonts {
-    val display = FontFamily(
-        Font(R.font.fredoka_600semibold, FontWeight.SemiBold),
-        Font(R.font.fredoka_700bold, FontWeight.Bold),
-    )
-
-    val body = FontFamily(
+    val sans = FontFamily(
         Font(R.font.nunitosans_400regular, FontWeight.Normal),
         Font(R.font.nunitosans_600semibold, FontWeight.SemiBold),
         Font(R.font.nunitosans_700bold, FontWeight.Bold),

@@ -14,7 +14,7 @@ internal fun ArFootnote(modifier: Modifier = Modifier) {
             "Aponte para o alvo impresso, para o cubo ou para um QR code do material " +
             "para o conteúdo aparecer sobre ele.",
         style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp, lineHeight = 18.sp),
-        color = ClaramenteColors.TextSecondary,
+        color = ClaramenteColors.TextTertiary,
         modifier = modifier,
     )
 }
