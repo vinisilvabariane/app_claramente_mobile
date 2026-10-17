@@ -1,5 +1,7 @@
 package com.claramente.feature.ar.state
 
+import com.claramente.feature.ar.policy.ArWebUrlPolicy
+
 data class ArExperienceUiState(
     val mode: ArMode = ArMode.MARKER,
     val model: ArModel? = null,
@@ -11,7 +13,10 @@ data class ArExperienceUiState(
     val failure: String? = null,
     val arWebUrl: String? = null,
     val attempt: Int = 0,
+    val available: List<ArModel> = ArModels.all,
 ) {
+    fun resolveQr(raw: String): ArModel? = ArModels.resolveFromQr(raw, available)
+
     val stage: ArStage
         get() = when {
             failure != null -> ArStage.FAILED
@@ -39,5 +44,5 @@ data class ArExperienceUiState(
         }
 
     val webUrl: String?
-        get() = arWebUrl?.trimEnd('/')?.let { "$it/ar/index.html?modelo=${(model ?: ArModels.default).id}" }
+        get() = ArWebUrlPolicy.url(arWebUrl, model ?: ArModels.default)
 }

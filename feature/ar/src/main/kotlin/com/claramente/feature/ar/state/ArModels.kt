@@ -1,8 +1,8 @@
 package com.claramente.feature.ar.state
 
-object ArModels {
-    private const val QR_PREFIX = "claramente:"
+import com.claramente.core.domain.policy.ModelQrPolicy
 
+object ArModels {
     val SOLAR = ArModel(
         id = "solar",
         title = "Sistema Solar",
@@ -25,9 +25,8 @@ object ArModels {
     val all: List<ArModel> = listOf(SOLAR, AGUA, SOLIDOS)
     val default: ArModel = SOLAR
 
-    fun resolveFromQr(data: String): ArModel? {
-        val raw = data.trim().lowercase()
-        val id = if (raw.startsWith(QR_PREFIX)) raw.removePrefix(QR_PREFIX) else raw
-        return all.firstOrNull { it.id == id }
+    fun resolveFromQr(data: String, models: List<ArModel> = all): ArModel? {
+        val id = ModelQrPolicy.idFrom(data)
+        return models.firstOrNull { it.id.lowercase() == id }
     }
 }

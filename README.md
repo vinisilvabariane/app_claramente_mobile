@@ -25,8 +25,7 @@ CLARAMENTE_AR_WEB_URL=https://seu-site.pages.dev # página de AR publicada em HT
 `app/build.gradle.kts` lê o arquivo e expõe `BuildConfig.API_BASE_URL`, `BuildConfig.MOCK_AUTH` e
 `BuildConfig.AR_WEB_URL`. Cada chave também pode vir por `-PCLARAMENTE_...` ou variável de ambiente.
 `CLARAMENTE_MOCK_AUTH` aceita `true`/`false` (ou `1`, como no `.env` do React); qualquer outro valor
-vale `false`. Sem `CLARAMENTE_AR_WEB_URL` a aba AR mostra o aviso de configuração em vez do botão de
-abrir. Só o build debug permite `http` (cleartext) para falar com a API local
+vale `false`. Sem `CLARAMENTE_AR_WEB_URL` o botão "Abrir versão web" não aparece. Só o build debug permite `http` (cleartext) para falar com a API local
 (`res/xml/network_security_config.xml` de `src/debug`); o release bloqueia cleartext em qualquer API.
 
 ## Build
@@ -68,7 +67,7 @@ antes de gerar um APK para distribuir**, senão qualquer pessoa entra sem senha.
 
 Os screenshot tests (plugin `com.android.compose.screenshot`) vivem em
 `app/src/screenshotTest/kotlin/.../screenshot/`: um `@PreviewTest` por arquivo (`LoginPreview`,
-`HubPreview`, `ProfilePreview`, `ArPreview`, ...) e o tamanho de tela em `PreviewDevices`. As
+`HubPreview`, `ProfilePreview`, `StudentClassroomPreview`, `TeacherLibraryPreview`, ...) e o tamanho de tela em `PreviewDevices`. As
 referências PNG ficam em `app/src/screenshotTestDebug/reference/`, uma pasta por preview. A flag
 `android.experimental.enableScreenshotTest=true` precisa estar nos dois lugares: em `gradle.properties`
 (exigida pelo plugin) e em `experimentalProperties` de `app/build.gradle.kts` (exigida pelo AGP para
@@ -100,8 +99,31 @@ feature/
 ├─ login/            view/LoginScreen, component/, state/, viewmodel/LoginViewModel
 ├─ hub/              view/HubScreen, component/, state/ (HubFeed, FeedItem, FeedTone)
 ├─ profile/          view/ProfileScreen, component/
-└─ ar/               view/ArScreen, component/, state/ (ArModels, ArUiState), viewmodel/ArViewModel
+├─ classroom/        lado do aluno: view/StudentClassroomScreen, viewmodel/StudentClassroomViewModel
+├─ teacher/          lado do professor: view/TeacherClassroomsScreen, view/TeacherLibraryScreen, viewmodel/
+└─ ar/               view/ (ArLaunchDialog, ArExamplesSection, ArExperienceScreen), component/, state/ (ArModels), viewmodel/ArExperienceViewModel
 ```
+
+### Aluno e professor
+
+O papel vem da claim `roles` do JWT e é resolvido por `RolePolicy` (`core:auth`): `admin` vira
+`UserRole.TEACHER`, qualquer outro valor vira `UserRole.STUDENT`. O valor do professor fica só em
+`RolePolicy.TEACHER_ROLE` (espelha `Roles.Teacher` do backend). O `HomeShell` monta as abas pelo papel:
+
+| Papel | Abas |
+|---|---|
+| Aluno | Início · Turma (entrar com código, ver modelos liberados, modelos de exemplo) · Perfil |
+| Professor | Turmas (criar, código, alunos, liberar modelos) · Biblioteca (enviar `.glb`, modelos de exemplo) · Perfil |
+
+Não há aba de AR: "Ver em realidade aumentada" (Turma) e "Testar em AR" (Biblioteca) baixam o `.glb`
+(cache em `filesDir/models`, chave = SHA-256) e abrem a `ArLaunchDialog`, que escolhe o modo (marcador, cubo, QR `claramente:<id>`). O modelo é
+normalizado para 10 cm (`GlbSceneDefaults`). Modelos enviados não têm versão web. O modo teste não
+acessa turmas nem modelos (`OnlineSessionPolicy`).
+
+Cada modelo da Biblioteca tem um botão "QR code" (`ModelQrDialog`): mostra o QR `claramente:<id>` para
+projetar e imprime uma folha pelo serviço de impressão do Android. O formato do QR fica só em
+`ModelQrPolicy` (`core:domain`), usado tanto por quem gera quanto pela leitura na AR. A folha dos modelos de
+exemplo é `release/qrcodes.pdf`, gerada por `release/make_qr_pdf.py` (Pillow + `qrcode`).
 
 Regras principais:
 
@@ -129,9 +151,10 @@ Porta do `AuthProvider` do React.
 
 ### Realidade aumentada nativa
 
-A aba AR roda a AR dentro do app, com ARCore e SceneView (Filament), sem abrir o navegador. A tela
-`ArScreen` escolhe o conteúdo (Sistema Solar, Molécula de água, Sólidos geométricos) e o modo; o botão
-abre a `ArExperienceScreen` em tela cheia (`Routes.AR_EXPERIENCE`).
+A AR roda dentro do app, com ARCore e SceneView (Filament), sem abrir o navegador. Os modelos de exemplo
+(Sistema Solar, Molécula de água, Sólidos geométricos) ficam na `ArExamplesSection`, no fim das abas Turma e
+Biblioteca. Tocar num modelo abre a `ArLaunchDialog` (folha inferior), que escolhe o modo; "Abrir câmera" leva à
+`ArExperienceScreen` em tela cheia (`Routes.AR_EXPERIENCE`).
 
 | Modo | Como funciona |
 |---|---|
@@ -139,7 +162,7 @@ abre a `ArExperienceScreen` em tela cheia (`Routes.AR_EXPERIENCE`).
 | Cubo | 6 faces (`cube-face-1..6.jpg`, 5 cm). Uma face ativa por vez (`CubeFacePolicy`); o modelo fica no centro do cubo. |
 | QR code | O ML Kit lê o QR dentro da própria sessão ARCore (`QrFrameScanner`). `claramente:<id>` ou o id cru escolhe o modelo, fixado 0,5 m à frente. |
 
-Os modelos são primitivas 3D (esferas, cubos, cone, texto com billboard) com as medidas do React, sem
+Os modelos de exemplo são primitivas 3D (esferas, cubos, cone, texto com billboard) com as medidas do React, sem
 arquivos glTF. Antes de abrir a câmera a tela verifica o ARCore (`ArCoreSupportProbe`): pede a instalação do
 Google Play Services for AR quando falta e, em aparelho sem suporte, oferece a versão web (botão "Abrir
 versão web", que usa `CLARAMENTE_AR_WEB_URL`). O manifest declara a AR como opcional, então o app instala em
@@ -148,6 +171,6 @@ qualquer aparelho. Os alvos do marcador e do cubo são montados em tempo de exec
 
 ### Realidade aumentada (versão web)
 
-A aba AR lista os conteúdos (`ArModels`) e abre `<CLARAMENTE_AR_WEB_URL>/ar/index.html?modelo=<id>`
+Para os modelos de exemplo, a `ArLaunchDialog` (e a tela de AR em aparelho sem suporte) abre `<CLARAMENTE_AR_WEB_URL>/ar/index.html?modelo=<id>`
 em uma Custom Tab (toolbar na cor Ink), com fallback para o navegador padrão. A câmera roda no
 navegador e exige HTTPS, por isso a página precisa estar publicada.

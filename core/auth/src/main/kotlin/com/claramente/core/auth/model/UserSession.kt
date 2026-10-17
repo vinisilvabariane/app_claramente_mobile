@@ -1,5 +1,6 @@
 package com.claramente.core.auth.model
 
+import com.claramente.core.model.auth.UserRole
 import com.claramente.core.network.http.AuthSession
 
 data class UserSession(
@@ -8,6 +9,7 @@ data class UserSession(
     val email: String,
     val name: String,
     val roles: List<String>,
+    val role: UserRole,
     val department: String?,
     val registration: String?,
     val expiresAt: Long,
@@ -23,6 +25,6 @@ data class UserSession(
             return (first + last).uppercase().ifEmpty { "?" }
         }
 
-    val rolesLabel: String?
-        get() = roles.joinToString(", ").takeIf { it.isNotBlank() }
+    val isTeacher: Boolean
+        get() = role == UserRole.TEACHER
 }

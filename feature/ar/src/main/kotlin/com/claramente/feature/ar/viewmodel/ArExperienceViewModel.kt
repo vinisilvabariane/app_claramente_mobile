@@ -17,11 +17,12 @@ class ArExperienceViewModel(arWebUrl: String?) : ViewModel() {
     private val _state = MutableStateFlow(ArExperienceUiState(arWebUrl = webUrl))
     val state: StateFlow<ArExperienceUiState> = _state.asStateFlow()
 
-    fun start(mode: ArMode, model: ArModel) {
+    fun start(mode: ArMode, model: ArModel, available: List<ArModel> = ArModels.all) {
         _state.value = ArExperienceUiState(
             mode = mode,
             model = if (mode == ArMode.QR) null else model,
             arWebUrl = webUrl,
+            available = available,
         )
     }
 
@@ -42,7 +43,7 @@ class ArExperienceViewModel(arWebUrl: String?) : ViewModel() {
     }
 
     fun onQr(raw: String) {
-        val resolved = ArModels.resolveFromQr(raw)
+        val resolved = _state.value.resolveQr(raw)
         _state.update {
             if (resolved != null) it.copy(model = resolved, unknownCode = null) else it.copy(unknownCode = raw)
         }

@@ -3,9 +3,11 @@ package com.claramente
 import com.claramente.core.designsystem.theme.ClaramenteColors
 import com.claramente.core.designsystem.theme.ClaramenteTheme
 import com.claramente.feature.ar.viewmodel.ArExperienceViewModel
-import com.claramente.feature.ar.viewmodel.ArViewModel
+import com.claramente.feature.classroom.viewmodel.StudentClassroomViewModel
 import com.claramente.feature.login.viewmodel.LoginViewModel
 import com.claramente.feature.session.viewmodel.SessionViewModel
+import com.claramente.feature.teacher.viewmodel.TeacherClassroomsViewModel
+import com.claramente.feature.teacher.viewmodel.TeacherLibraryViewModel
 import com.claramente.navigation.AppNavigation
 import android.content.Intent
 import android.os.Bundle
@@ -33,12 +35,45 @@ class MainActivity : ComponentActivity() {
         viewModelFactory { initializer { with(container) { LoginViewModel(login, mockLogin, mockAuthEnabled) } } }
     }
 
-    private val arViewModel: ArViewModel by viewModels {
-        viewModelFactory { initializer { with(container) { ArViewModel(arWebUrl) } } }
-    }
-
     private val arExperienceViewModel: ArExperienceViewModel by viewModels {
         viewModelFactory { initializer { with(container) { ArExperienceViewModel(arWebUrl) } } }
+    }
+
+    private val studentClassroomViewModel: StudentClassroomViewModel by viewModels {
+        viewModelFactory {
+            initializer {
+                with(container) {
+                    StudentClassroomViewModel(listClassrooms, joinClassroom, leaveClassroom, listClassroomModels, prepareModel)
+                }
+            }
+        }
+    }
+
+    private val teacherClassroomsViewModel: TeacherClassroomsViewModel by viewModels {
+        viewModelFactory {
+            initializer {
+                with(container) {
+                    TeacherClassroomsViewModel(
+                        listClassrooms,
+                        createClassroom,
+                        deleteClassroom,
+                        regenerateJoinCode,
+                        listStudents,
+                        removeStudent,
+                        listLibrary,
+                        setModelPublished,
+                    )
+                }
+            }
+        }
+    }
+
+    private val teacherLibraryViewModel: TeacherLibraryViewModel by viewModels {
+        viewModelFactory {
+            initializer {
+                with(container) { TeacherLibraryViewModel(listLibrary, inspectModelFile, uploadModel, deleteModel, prepareModel) }
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,8 +88,11 @@ class MainActivity : ComponentActivity() {
                 AppNavigation(
                     sessionViewModel = sessionViewModel,
                     loginViewModel = loginViewModel,
-                    arViewModel = arViewModel,
                     arExperienceViewModel = arExperienceViewModel,
+                    studentClassroomViewModel = studentClassroomViewModel,
+                    teacherClassroomsViewModel = teacherClassroomsViewModel,
+                    teacherLibraryViewModel = teacherLibraryViewModel,
+                    arWebUrl = container.arWebUrl,
                     onOpenUrl = ::openUrl,
                 )
             }

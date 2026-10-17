@@ -8,7 +8,6 @@ import com.claramente.feature.ar.policy.TrackingGracePolicy
 import com.claramente.feature.ar.state.ArExperienceActions
 import com.claramente.feature.ar.state.ArExperienceUiState
 import com.claramente.feature.ar.state.ArMode
-import com.claramente.feature.ar.state.ArModels
 import com.claramente.feature.ar.state.ImageTargets
 import com.claramente.feature.ar.state.QrPlacement
 import android.os.SystemClock
@@ -175,7 +174,7 @@ internal fun ArSessionView(state: ArExperienceUiState, actions: ArExperienceActi
                     placeQr(session, frame, nowMs)
                 } else if (anchor == null && currentState.model == null) {
                     scanner.scan(frame, nowMs) { raw ->
-                        if (ArModels.resolveFromQr(raw) == null) {
+                        if (currentState.resolveQr(raw) == null) {
                             currentActions.onQr(raw)
                         } else if (anchor == null && pending == null) {
                             pending = QrPlacement(raw, SystemClock.elapsedRealtime())
