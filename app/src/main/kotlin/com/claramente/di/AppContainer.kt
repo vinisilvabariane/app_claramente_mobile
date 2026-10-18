@@ -22,6 +22,7 @@ import com.claramente.core.domain.contract.ILoginUseCase
 import com.claramente.core.domain.contract.ILogoutUseCase
 import com.claramente.core.domain.contract.IMockLoginUseCase
 import com.claramente.core.domain.contract.IPrepareModelUseCase
+import com.claramente.core.domain.contract.IPrepareModelsUseCase
 import com.claramente.core.domain.contract.IRegenerateJoinCodeUseCase
 import com.claramente.core.domain.contract.IRemoveStudentUseCase
 import com.claramente.core.domain.contract.IRestoreSessionUseCase
@@ -41,6 +42,7 @@ import com.claramente.core.domain.usecase.LoginUseCase
 import com.claramente.core.domain.usecase.LogoutUseCase
 import com.claramente.core.domain.usecase.MockLoginUseCase
 import com.claramente.core.domain.usecase.PrepareModelUseCase
+import com.claramente.core.domain.usecase.PrepareModelsUseCase
 import com.claramente.core.domain.usecase.RegenerateJoinCodeUseCase
 import com.claramente.core.domain.usecase.RemoveStudentUseCase
 import com.claramente.core.domain.usecase.RestoreSessionUseCase
@@ -98,6 +100,7 @@ class AppContainer(val context: Context) {
     val listClassroomModels: IListClassroomModelsUseCase by lazy { ListClassroomModelsUseCase(classroomClient, sessions) }
 
     val prepareModel: IPrepareModelUseCase by lazy { PrepareModelUseCase(modelClient, modelFiles, sessions) }
+    val prepareModels: IPrepareModelsUseCase by lazy { PrepareModelsUseCase(prepareModel) }
 
     val createClassroom: ICreateClassroomUseCase by lazy { CreateClassroomUseCase(classroomClient, sessions) }
 

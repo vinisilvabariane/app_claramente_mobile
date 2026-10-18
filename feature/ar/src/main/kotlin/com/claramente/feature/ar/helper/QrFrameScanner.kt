@@ -1,5 +1,6 @@
 package com.claramente.feature.ar.helper
 
+import com.claramente.feature.ar.state.ScannedQr
 import com.google.ar.core.Frame
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
@@ -14,14 +15,22 @@ internal class QrFrameScanner : Closeable {
     private var busy = false
     private var lastAttemptMs = 0L
 
-    fun scan(frame: Frame, nowMs: Long, onResult: (String) -> Unit) {
+    fun scan(frame: Frame, nowMs: Long, onResult: (List<ScannedQr>) -> Unit) {
         if (busy || nowMs - lastAttemptMs < INTERVAL_MS) return
         val image = runCatching { frame.acquireCameraImage() }.getOrNull() ?: return
         busy = true
         lastAttemptMs = nowMs
         client.process(InputImage.fromMediaImage(image, 0))
             .addOnSuccessListener { codes ->
-                codes.firstNotNullOfOrNull { it.rawValue }?.let(onResult)
+                codes
+                    .mapNotNull { code ->
+                        val raw = code.rawValue ?: return@mapNotNull null
+                        val box = code.boundingBox
+                        ScannedQr(raw, box?.exactCenterX(), box?.exactCenterY())
+                    }
+                    .distinctBy { it.raw }
+                    .takeIf { it.isNotEmpty() }
+                    ?.let(onResult)
             }
             .addOnCompleteListener {
                 image.close()

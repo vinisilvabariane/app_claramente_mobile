@@ -117,7 +117,9 @@ O papel vem da claim `roles` do JWT e é resolvido por `RolePolicy` (`core:auth`
 
 Não há aba de AR: "Ver em realidade aumentada" (Turma) e "Testar em AR" (Biblioteca) baixam o `.glb`
 (cache em `filesDir/models`, chave = SHA-256) e abrem a `ArLaunchDialog`, que escolhe o modo (marcador, cubo, QR `claramente:<id>`). O modelo é
-normalizado para 10 cm (`GlbSceneDefaults`). Modelos enviados não têm versão web. O modo teste não
+normalizado para 10 cm (`GlbSceneDefaults`). No topo da Turma e da Biblioteca, a `ArScannerSection` ("Ler QR codes")
+baixa todos os modelos da turma/biblioteca (`PrepareModelsUseCase`, um modelo com falha não bloqueia os outros) e abre a
+AR direto no modo QR reconhecendo esses modelos e os de exemplo. Modelos enviados não têm versão web. O modo teste não
 acessa turmas nem modelos (`OnlineSessionPolicy`).
 
 Cada modelo da Biblioteca tem um botão "QR code" (`ModelQrDialog`): mostra o QR `claramente:<id>` para
@@ -160,7 +162,7 @@ Biblioteca. Tocar num modelo abre a `ArLaunchDialog` (folha inferior), que escol
 |---|---|
 | Marcador | Augmented Images com `app/.../assets/ar/marker.jpg` (12 cm). O modelo aparece sobre a folha impressa. |
 | Cubo | 6 faces (`cube-face-1..6.jpg`, 5 cm). Uma face ativa por vez (`CubeFacePolicy`); o modelo fica no centro do cubo. |
-| QR code | O ML Kit lê o QR dentro da própria sessão ARCore (`QrFrameScanner`). `claramente:<id>` ou o id cru escolhe o modelo, fixado 0,5 m à frente. |
+| QR code | O ML Kit lê o QR dentro da própria sessão ARCore (`QrFrameScanner`). `claramente:<id>` ou o id cru escolhe o modelo, fixado sobre o próprio QR (hit test no centro do QR na superfície detectada) ou, sem superfície, 0,5 m à frente. A leitura continua: outro QR adiciona outro modelo em cima dele (até 4, sem repetir, `QrLayoutPolicy`); com mais de um, a escala cai de 1,5× para 1×. Só os modelos flutuantes são afastados 22 cm entre si. "Limpar modelos" remove todos. |
 
 Os modelos de exemplo são primitivas 3D (esferas, cubos, cone, texto com billboard) com as medidas do React, sem
 arquivos glTF. Antes de abrir a câmera a tela verifica o ARCore (`ArCoreSupportProbe`): pede a instalação do

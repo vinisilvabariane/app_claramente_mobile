@@ -4,9 +4,11 @@ import com.claramente.core.domain.contract.IDeleteModelUseCase
 import com.claramente.core.domain.contract.IInspectModelFileUseCase
 import com.claramente.core.domain.contract.IListLibraryUseCase
 import com.claramente.core.domain.contract.IPrepareModelUseCase
+import com.claramente.core.domain.contract.IPrepareModelsUseCase
 import com.claramente.core.domain.contract.IUploadModelUseCase
 import com.claramente.core.domain.policy.ErrorMessagePolicy
 import com.claramente.core.model.classroom.Model3D
+import com.claramente.core.model.classroom.PreparedModel
 import com.claramente.feature.teacher.state.TeacherLibraryUiState
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -25,6 +27,7 @@ class TeacherLibraryViewModel(
     private val uploadModel: IUploadModelUseCase,
     private val deleteModel: IDeleteModelUseCase,
     private val prepareModel: IPrepareModelUseCase,
+    private val prepareModels: IPrepareModelsUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(TeacherLibraryUiState())
     val state: StateFlow<TeacherLibraryUiState> = _state.asStateFlow()
@@ -118,7 +121,7 @@ class TeacherLibraryViewModel(
     }
 
     fun preview(model: Model3D, onReady: (Model3D, String) -> Unit) {
-        if (_state.value.preparingId != null) return
+        if (_state.value.preparingId != null || _state.value.scanProgress != null) return
         _state.update { it.copy(preparingId = model.id, preparingProgress = 0f, error = null) }
         viewModelScope.launch {
             val result = withContext(Dispatchers.IO) {
@@ -130,6 +133,25 @@ class TeacherLibraryViewModel(
                     onReady(model, uri)
                 },
                 onFailure = { error -> fail(error) { it.copy(preparingId = null) } },
+            )
+        }
+    }
+
+    fun openScanner(onReady: (List<PreparedModel>) -> Unit) {
+        val current = _state.value
+        if (current.scanProgress != null || current.preparingId != null) return
+        _state.update { it.copy(scanProgress = 0 to current.models.size, error = null) }
+        viewModelScope.launch {
+            val result = withContext(Dispatchers.IO) {
+                prepareModels.execute(current.models) { done, total -> _state.update { it.copy(scanProgress = done to total) } }
+            }
+            _state.update { it.copy(scanProgress = null) }
+            result.fold(
+                onSuccess = onReady,
+                onFailure = { error ->
+                    fail(error) { it }
+                    onReady(emptyList())
+                },
             )
         }
     }

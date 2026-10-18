@@ -39,6 +39,7 @@ fun TeacherLibraryScreen(
     state: TeacherLibraryUiState,
     actions: TeacherLibraryActions,
     examples: @Composable () -> Unit = {},
+    scanner: @Composable () -> Unit = {},
 ) {
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri?.let { actions.onPickFile(it.toString()) }
@@ -68,6 +69,7 @@ fun TeacherLibraryScreen(
             )
             state.error?.let { MessageBox(message = it) }
             state.notice?.let { MessageBox(message = it, isError = false) }
+            scanner()
             UploadModelCard(
                 state = state,
                 actions = actions,

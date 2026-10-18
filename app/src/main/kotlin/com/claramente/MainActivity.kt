@@ -43,7 +43,7 @@ class MainActivity : ComponentActivity() {
         viewModelFactory {
             initializer {
                 with(container) {
-                    StudentClassroomViewModel(listClassrooms, joinClassroom, leaveClassroom, listClassroomModels, prepareModel)
+                    StudentClassroomViewModel(listClassrooms, joinClassroom, leaveClassroom, listClassroomModels, prepareModel, prepareModels)
                 }
             }
         }
@@ -71,7 +71,7 @@ class MainActivity : ComponentActivity() {
     private val teacherLibraryViewModel: TeacherLibraryViewModel by viewModels {
         viewModelFactory {
             initializer {
-                with(container) { TeacherLibraryViewModel(listLibrary, inspectModelFile, uploadModel, deleteModel, prepareModel) }
+                with(container) { TeacherLibraryViewModel(listLibrary, inspectModelFile, uploadModel, deleteModel, prepareModel, prepareModels) }
             }
         }
     }

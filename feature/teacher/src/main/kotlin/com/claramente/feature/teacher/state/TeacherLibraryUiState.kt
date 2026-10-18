@@ -15,6 +15,7 @@ data class TeacherLibraryUiState(
     val deletingId: String? = null,
     val preparingId: String? = null,
     val preparingProgress: Float = 0f,
+    val scanProgress: Pair<Int, Int>? = null,
     val error: String? = null,
     val notice: String? = null,
 ) {

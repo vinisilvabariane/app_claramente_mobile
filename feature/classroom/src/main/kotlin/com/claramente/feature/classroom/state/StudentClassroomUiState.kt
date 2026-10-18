@@ -14,6 +14,7 @@ data class StudentClassroomUiState(
     val leaving: Boolean = false,
     val preparingId: String? = null,
     val preparingProgress: Float = 0f,
+    val scanProgress: Pair<Int, Int>? = null,
     val error: String? = null,
 ) {
     val selected: Classroom?

@@ -45,12 +45,16 @@ class ArExperienceViewModel(arWebUrl: String?) : ViewModel() {
     fun onQr(raw: String) {
         val resolved = _state.value.resolveQr(raw)
         _state.update {
-            if (resolved != null) it.copy(model = resolved, unknownCode = null) else it.copy(unknownCode = raw)
+            when {
+                resolved == null -> it.copy(unknownCode = raw)
+                it.qrModels.any { placed -> placed.id == resolved.id } -> it.copy(model = resolved, unknownCode = null)
+                else -> it.copy(model = resolved, qrModels = it.qrModels + resolved, unknownCode = null)
+            }
         }
     }
 
     fun onRescan() {
-        _state.update { it.copy(model = null, unknownCode = null) }
+        _state.update { it.copy(model = null, qrModels = emptyList(), unknownCode = null) }
     }
 
     fun onSessionFailed(message: String?) {

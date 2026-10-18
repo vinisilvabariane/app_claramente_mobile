@@ -42,6 +42,7 @@ fun StudentClassroomScreen(
     state: StudentClassroomUiState,
     actions: StudentClassroomActions,
     examples: @Composable () -> Unit = {},
+    scanner: @Composable () -> Unit = {},
 ) {
     if (state.loading) {
         LoadingScreen()
@@ -71,6 +72,7 @@ fun StudentClassroomScreen(
                 subtitle = if (selected == null) "Entre na turma para ver os modelos 3D do seu professor." else null,
             )
             state.error?.let { MessageBox(message = it) }
+            scanner()
             if (selected == null) {
                 JoinClassroomCard(
                     title = "Entrar em uma turma",

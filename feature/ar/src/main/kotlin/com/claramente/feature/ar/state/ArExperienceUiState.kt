@@ -1,10 +1,12 @@
 package com.claramente.feature.ar.state
 
 import com.claramente.feature.ar.policy.ArWebUrlPolicy
+import com.claramente.feature.ar.policy.QrLayoutPolicy
 
 data class ArExperienceUiState(
     val mode: ArMode = ArMode.MARKER,
     val model: ArModel? = null,
+    val qrModels: List<ArModel> = emptyList(),
     val support: ArSupport = ArSupport.CHECKING,
     val cameraGranted: Boolean? = null,
     val cameraRequested: Boolean = false,
@@ -32,13 +34,17 @@ data class ArExperienceUiState(
 
     val title: String
         get() = when {
+            qrModels.size > 1 -> qrModels.joinToString(" + ") { it.title }
             model != null -> model.title
             else -> "Leitor de QR code"
         }
 
     val hint: String
         get() = when {
-            mode == ArMode.QR && model != null -> "${model.subject} · aponte o celular à frente"
+            mode == ArMode.QR && qrModels.size >= QrLayoutPolicy.MAX_MODELS ->
+                "Limite de ${QrLayoutPolicy.MAX_MODELS} modelos — toque em Limpar para recomeçar"
+            mode == ArMode.QR && model != null ->
+                "Leia outro QR para adicionar · ${qrModels.size} de ${QrLayoutPolicy.MAX_MODELS}"
             mode == ArMode.QR && unknownCode != null -> "QR não reconhecido — use os códigos do app"
             else -> mode.hint
         }

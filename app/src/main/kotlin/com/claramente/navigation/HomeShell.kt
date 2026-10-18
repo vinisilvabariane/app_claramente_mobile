@@ -3,12 +3,14 @@ package com.claramente.navigation
 import com.claramente.core.designsystem.theme.ClaramenteColors
 import com.claramente.core.model.auth.UserRole
 import com.claramente.core.model.classroom.Model3D
+import com.claramente.core.model.classroom.PreparedModel
 import com.claramente.feature.ar.state.ArMode
 import com.claramente.feature.ar.state.ArModel
 import com.claramente.feature.ar.state.ArModels
 import com.claramente.feature.ar.policy.ArWebUrlPolicy
 import com.claramente.feature.ar.view.ArExamplesSection
 import com.claramente.feature.ar.view.ArLaunchDialog
+import com.claramente.feature.ar.view.ArScannerSection
 import com.claramente.feature.classroom.state.StudentClassroomActions
 import com.claramente.feature.classroom.view.StudentClassroomScreen
 import com.claramente.feature.classroom.viewmodel.StudentClassroomViewModel
@@ -34,6 +36,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -66,7 +69,13 @@ fun HomeShell(
         }
     }
     var launching by remember { mutableStateOf<ArModel?>(null) }
-    val openInAr: (Model3D, String) -> Unit = { model, uri -> launching = ClassroomArMapper.toArModel(model, uri) }
+    val opened = remember { mutableStateMapOf<String, ArModel>() }
+    val track: (ArModel) -> ArModel = { model -> model.also { opened[it.id] = it } }
+    val openInAr: (Model3D, String) -> Unit = { model, uri -> launching = track(ClassroomArMapper.toArModel(model, uri)) }
+    val startScanner: (List<PreparedModel>) -> Unit = { prepared ->
+        val models = prepared.map { track(ClassroomArMapper.toArModel(it.model, it.fileUri)) }
+        onStartAr(ArMode.QR, ArModels.default, (models + opened.values + ArModels.all).distinctBy { it.id })
+    }
     val examples: @Composable () -> Unit = { ArExamplesSection(onOpen = { launching = it }) }
 
     Scaffold(
@@ -97,6 +106,12 @@ fun HomeShell(
                     val state by studentClassroomViewModel.state.collectAsState()
                     StudentClassroomScreen(
                         examples = examples,
+                        scanner = {
+                            ArScannerSection(
+                                progress = state.scanProgress,
+                                onScan = { studentClassroomViewModel.openScanner(startScanner) },
+                            )
+                        },
                         state = state,
                         actions = StudentClassroomActions(
                             onRefresh = studentClassroomViewModel::load,
@@ -137,6 +152,12 @@ fun HomeShell(
                     val state by teacherLibraryViewModel.state.collectAsState()
                     TeacherLibraryScreen(
                         examples = examples,
+                        scanner = {
+                            ArScannerSection(
+                                progress = state.scanProgress,
+                                onScan = { teacherLibraryViewModel.openScanner(startScanner) },
+                            )
+                        },
                         state = state,
                         actions = TeacherLibraryActions(
                             onRefresh = teacherLibraryViewModel::load,
@@ -164,7 +185,7 @@ fun HomeShell(
             webUrl = webUrl,
             onStart = { mode ->
                 launching = null
-                onStartAr(mode, model, (listOf(model) + ArModels.all).distinctBy { it.id })
+                onStartAr(mode, model, (listOf(model) + opened.values + ArModels.all).distinctBy { it.id })
             },
             onOpenWeb = { webUrl?.let(onOpenUrl) },
             onDismiss = { launching = null },
