@@ -59,7 +59,7 @@ Pastas permitidas dentro do pacote de cada módulo (crie só as que tiverem arqu
 | `service/` | **somente** subclasses de `android.app.Service` | `*Service` |
 | `di/`, `navigation/` | só no `app` | `AppContainer`, `AppNavigation`, `HomeShell`, `Routes` |
 | `screenshot/` | só em `app/src/screenshotTest`: um `@PreviewTest` por arquivo | `*Preview`, `PreviewDevices` |
-| `auth/`, `ar/` | áreas do `core:model` (modelo de domínio) | substantivo: `AuthTokens` |
+| `auth/`, `ar/`, `classroom/` | áreas do `core:model` (modelo de domínio) | substantivo: `AuthTokens`, `Classroom` |
 | `theme/` | tema do `core:designsystem` (cores, tipografia, raios, movimento) | `ClaramenteTheme`, `ClaramenteColors` |
 
 Em `core:*` e `feature:*` todo arquivo fica dentro de uma pasta de papel; nada solto na raiz do pacote.

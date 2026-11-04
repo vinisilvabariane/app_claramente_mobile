@@ -4,11 +4,13 @@ import com.claramente.core.designsystem.component.LoadingScreen
 import com.claramente.feature.ar.state.ArExperienceActions
 import com.claramente.feature.ar.view.ArExperienceScreen
 import com.claramente.feature.ar.viewmodel.ArExperienceViewModel
-import com.claramente.feature.ar.viewmodel.ArViewModel
+import com.claramente.feature.classroom.viewmodel.StudentClassroomViewModel
 import com.claramente.feature.login.state.LoginActions
 import com.claramente.feature.login.view.LoginScreen
 import com.claramente.feature.login.viewmodel.LoginViewModel
 import com.claramente.feature.session.viewmodel.SessionViewModel
+import com.claramente.feature.teacher.viewmodel.TeacherClassroomsViewModel
+import com.claramente.feature.teacher.viewmodel.TeacherLibraryViewModel
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -22,11 +24,20 @@ import androidx.navigation.compose.rememberNavController
 fun AppNavigation(
     sessionViewModel: SessionViewModel,
     loginViewModel: LoginViewModel,
-    arViewModel: ArViewModel,
     arExperienceViewModel: ArExperienceViewModel,
+    studentClassroomViewModel: StudentClassroomViewModel,
+    teacherClassroomsViewModel: TeacherClassroomsViewModel,
+    teacherLibraryViewModel: TeacherLibraryViewModel,
+    arWebUrl: String?,
     onOpenUrl: (String) -> Unit,
 ) {
     val session by sessionViewModel.state.collectAsState()
+    val userId = session.user?.id
+
+    LaunchedEffect(userId) {
+        teacherClassroomsViewModel.clear()
+        teacherLibraryViewModel.clear()
+    }
 
     if (!session.checked) {
         LoadingScreen()
@@ -61,11 +72,14 @@ fun AppNavigation(
             composable(Routes.HOME) {
                 HomeShell(
                     session = session,
-                    arViewModel = arViewModel,
+                    arWebUrl = arWebUrl,
+                    studentClassroomViewModel = studentClassroomViewModel,
+                    teacherClassroomsViewModel = teacherClassroomsViewModel,
+                    teacherLibraryViewModel = teacherLibraryViewModel,
                     onLogout = sessionViewModel::logout,
                     onOpenUrl = onOpenUrl,
-                    onStartAr = { mode, model ->
-                        arExperienceViewModel.start(mode, model)
+                    onStartAr = { mode, model, available ->
+                        arExperienceViewModel.start(mode, model, available)
                         navController.navigate(Routes.AR_EXPERIENCE)
                     },
                 )

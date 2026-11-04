@@ -3,6 +3,7 @@ package com.claramente.core.domain.usecase
 import com.claramente.core.auth.controller.SessionController
 import com.claramente.core.auth.policy.MockTokenPolicy
 import com.claramente.core.model.auth.AuthTokens
+import com.claramente.core.model.auth.UserRole
 import com.claramente.core.network.http.ApiException
 import com.claramente.core.network.http.AuthSession
 import java.io.IOException
@@ -33,7 +34,8 @@ class SessionUseCasesTest {
         val session = result.getOrThrow()
         assertEquals("ana@claramente.local", session.email)
         assertEquals("Teste Local", session.name)
-        assertEquals(listOf("Aluno"), session.roles)
+        assertEquals(listOf("student"), session.roles)
+        assertEquals(UserRole.STUDENT, session.role)
         assertEquals(session, sessions.current.value)
         assertEquals(listOf("login:ana@claramente.local"), client.calls)
         assertEquals(listOf("save"), store.calls)

@@ -5,4 +5,8 @@ data class ArModel(
     val title: String,
     val subject: String,
     val description: String,
-)
+    val fileUri: String? = null,
+) {
+    val isCustom: Boolean
+        get() = fileUri != null
+}

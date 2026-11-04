@@ -92,6 +92,8 @@ dependencies {
     implementation(project(":feature:hub"))
     implementation(project(":feature:profile"))
     implementation(project(":feature:ar"))
+    implementation(project(":feature:classroom"))
+    implementation(project(":feature:teacher"))
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)

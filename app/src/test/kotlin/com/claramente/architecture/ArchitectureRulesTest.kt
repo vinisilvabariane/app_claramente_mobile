@@ -30,7 +30,7 @@ class ArchitectureRulesTest {
     private val allowedFolders = setOf(
         "contract", "client", "store", "http", "dto", "mapper", "model", "policy", "helper",
         "view", "component", "state", "viewmodel", "controller", "service",
-        "di", "navigation", "theme", "usecase", "error", "auth", "ar",
+        "di", "navigation", "theme", "usecase", "error", "auth", "ar", "classroom",
     )
 
     private fun inFolder(file: File, folder: String) = file.invariantSeparatorsPath.contains("/$folder/")

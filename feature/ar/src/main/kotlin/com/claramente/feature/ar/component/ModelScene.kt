@@ -8,6 +8,11 @@ import androidx.compose.runtime.Composable
 
 @Composable
 internal fun SceneScope.ModelScene(model: ArModel, cameraPosition: () -> Position) {
+    val fileUri = model.fileUri
+    if (fileUri != null) {
+        GlbModelScene(fileUri)
+        return
+    }
     when (model.id) {
         ArModels.SOLAR.id -> SolarSystemScene(cameraPosition)
         ArModels.AGUA.id -> WaterMoleculeScene(cameraPosition)

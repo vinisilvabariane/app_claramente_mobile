@@ -39,8 +39,8 @@ internal fun IdentityCard(user: UserSession?) {
                         modifier = Modifier.padding(top = 2.dp),
                     )
                 }
-                user?.rolesLabel?.let { roles ->
-                    RoleBadge(label = roles, modifier = Modifier.padding(top = 10.dp))
+                user?.role?.let { role ->
+                    RoleBadge(label = role.label, modifier = Modifier.padding(top = 10.dp))
                 }
             }
         }

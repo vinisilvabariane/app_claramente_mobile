@@ -2,6 +2,7 @@ package com.claramente.core.auth.controller
 
 import com.claramente.core.auth.mapper.JwtClaimsMapper
 import com.claramente.core.auth.model.UserSession
+import com.claramente.core.auth.policy.RolePolicy
 import com.claramente.core.network.http.ApiException
 import com.claramente.core.network.http.AuthSession
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,15 +19,19 @@ class SessionController {
     val auth: AuthSession?
         get() = _current.value?.auth
 
+    fun requireAuth(): AuthSession = auth ?: throw ApiException(401, SESSION_EXPIRED)
+
     fun open(auth: AuthSession): UserSession {
         val claims = JwtClaimsMapper.payload(auth.token) ?: throw ApiException(401, "Token inválido.")
         val email = JwtClaimsMapper.text(claims, "email") ?: ""
+        val roles = JwtClaimsMapper.list(claims, "roles")
         return UserSession(
             auth = auth,
             id = JwtClaimsMapper.text(claims, "sub") ?: "",
             email = email,
             name = JwtClaimsMapper.text(claims, "name") ?: "",
-            roles = JwtClaimsMapper.list(claims, "roles"),
+            roles = roles,
+            role = RolePolicy.resolve(roles),
             department = JwtClaimsMapper.text(claims, "department"),
             registration = JwtClaimsMapper.text(claims, "registration"),
             expiresAt = JwtClaimsMapper.expiresAtMs(claims) ?: 0L,
@@ -39,5 +44,9 @@ class SessionController {
 
     fun clear() {
         _current.value = null
+    }
+
+    private companion object {
+        const val SESSION_EXPIRED = "Sessão expirada. Entre de novo."
     }
 }

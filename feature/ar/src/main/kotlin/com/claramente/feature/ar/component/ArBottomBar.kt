@@ -31,7 +31,7 @@ internal fun ArBottomBar(state: ArExperienceUiState, actions: ArExperienceAction
         contentAlignment = Alignment.Center,
     ) {
         if (state.mode == ArMode.QR && state.model != null) {
-            PrimaryButton(text = "Ler outro QR code", onClick = actions.onRescan)
+            PrimaryButton(text = "Limpar modelos", onClick = actions.onRescan)
         } else {
             val text = when {
                 state.mode == ArMode.QR -> "Procurando o QR code..."

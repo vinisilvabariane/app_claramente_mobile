@@ -1,7 +1,8 @@
 package com.claramente.navigation
 
-import com.claramente.core.designsystem.component.ArGlyph
+import com.claramente.core.designsystem.component.ClassroomGlyph
 import com.claramente.core.designsystem.component.HomeGlyph
+import com.claramente.core.designsystem.component.LibraryGlyph
 import com.claramente.core.designsystem.component.ProfileGlyph
 import com.claramente.core.designsystem.theme.ClaramenteColors
 import com.claramente.core.designsystem.theme.ClaramenteRadius
@@ -40,7 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun HomeTabBar(current: HomeTab, onSelect: (HomeTab) -> Unit) {
+fun HomeTabBar(current: HomeTab, onSelect: (HomeTab) -> Unit, tabs: List<HomeTab> = HomeTab.student) {
     val bottomInset = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
     Column(
         modifier = Modifier
@@ -56,7 +57,7 @@ fun HomeTabBar(current: HomeTab, onSelect: (HomeTab) -> Unit) {
                 .height(64.dp)
                 .padding(top = 8.dp),
         ) {
-            HomeTab.entries.forEach { tab ->
+            tabs.forEach { tab ->
                 val selected = tab == current
                 val color = if (selected) ClaramenteColors.Primary else ClaramenteColors.TabInactive
                 val interaction = remember { MutableInteractionSource() }
@@ -86,7 +87,9 @@ fun HomeTabBar(current: HomeTab, onSelect: (HomeTab) -> Unit) {
                     ) {
                         when (tab) {
                             HomeTab.HUB -> HomeGlyph(color = color, modifier = Modifier.size(22.dp))
-                            HomeTab.AR -> ArGlyph(color = color, modifier = Modifier.size(22.dp))
+                            HomeTab.CLASSROOM, HomeTab.TEACHER_CLASSROOMS ->
+                                ClassroomGlyph(color = color, modifier = Modifier.size(22.dp))
+                            HomeTab.LIBRARY -> LibraryGlyph(color = color, modifier = Modifier.size(22.dp))
                             HomeTab.PROFILE -> ProfileGlyph(color = color, modifier = Modifier.size(22.dp))
                         }
                     }

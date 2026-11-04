@@ -3,13 +3,14 @@ package com.claramente.feature.ar.component
 import com.claramente.feature.ar.helper.ImageTargetDatabaseBuilder
 import com.claramente.feature.ar.helper.QrFrameScanner
 import com.claramente.feature.ar.policy.CubeFacePolicy
+import com.claramente.feature.ar.policy.QrLayoutPolicy
 import com.claramente.feature.ar.policy.QrPlacementPolicy
 import com.claramente.feature.ar.policy.TrackingGracePolicy
 import com.claramente.feature.ar.state.ArExperienceActions
 import com.claramente.feature.ar.state.ArExperienceUiState
 import com.claramente.feature.ar.state.ArMode
-import com.claramente.feature.ar.state.ArModels
 import com.claramente.feature.ar.state.ImageTargets
+import com.claramente.feature.ar.state.PlacedQrModel
 import com.claramente.feature.ar.state.QrPlacement
 import android.os.SystemClock
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,10 +30,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntSize
-import com.google.ar.core.Anchor
 import com.google.ar.core.AugmentedImage
 import com.google.ar.core.Config
+import com.google.ar.core.Coordinates2d
 import com.google.ar.core.Frame
+import com.google.ar.core.Pose
 import com.google.ar.core.Session
 import com.google.ar.core.TrackingState
 import io.github.sceneview.ar.ARSceneView
@@ -57,8 +59,7 @@ internal fun ArSessionView(state: ArExperienceUiState, actions: ArExperienceActi
     val lastSeen = remember { HashMap<Int, Long>() }
     var visibleImages by remember { mutableStateOf(emptySet<Int>()) }
     var activeFace by remember { mutableStateOf<Int?>(null) }
-    var anchor by remember { mutableStateOf<Anchor?>(null) }
-    var onSurface by remember { mutableStateOf(false) }
+    val placements = remember { mutableStateListOf<PlacedQrModel>() }
     var pending by remember { mutableStateOf<QrPlacement?>(null) }
     var viewSize by remember { mutableStateOf(IntSize.Zero) }
     val scanner = remember { QrFrameScanner() }
@@ -72,40 +73,53 @@ internal fun ArSessionView(state: ArExperienceUiState, actions: ArExperienceActi
     DisposableEffect(Unit) {
         onDispose {
             scanner.close()
-            anchor?.detach()
+            placements.forEach { it.anchor.detach() }
         }
     }
 
     LaunchedEffect(needsRescan) {
         if (mode == ArMode.QR && needsRescan) {
-            anchor?.detach()
-            anchor = null
+            placements.forEach { it.anchor.detach() }
+            placements.clear()
             pending = null
-            onSurface = false
         }
+    }
+
+    fun qrViewPoint(frame: Frame, request: QrPlacement): Pair<Float, Float>? {
+        if (viewSize.width <= 0) return null
+        val x = request.code.imageX
+        val y = request.code.imageY
+        if (x == null || y == null) return viewSize.width / 2f to viewSize.height / 2f
+        val view = FloatArray(2)
+        return runCatching {
+            frame.transformCoordinates2d(Coordinates2d.IMAGE_PIXELS, floatArrayOf(x, y), Coordinates2d.VIEW, view)
+            view[0] to view[1]
+        }.getOrNull()?.takeIf { (vx, vy) -> vx in 0f..viewSize.width.toFloat() && vy in 0f..viewSize.height.toFloat() }
+            ?: (viewSize.width / 2f to viewSize.height / 2f)
     }
 
     fun placeQr(session: Session, frame: Frame, nowMs: Long) {
         val request = pending ?: return
         if (frame.camera.trackingState != TrackingState.TRACKING) return
-        val hit = if (viewSize.width > 0) {
-            QrPlacementPolicy.surfaceHit(frame, viewSize.width / 2f, viewSize.height / 2f)
+        val viewPoint = qrViewPoint(frame, request)
+        val hit = viewPoint?.let { (x, y) -> QrPlacementPolicy.surfaceHit(frame, x, y) }
+        val created = if (hit != null) {
+            runCatching { hit.createAnchor() }.getOrNull()
+        } else if (QrPlacementPolicy.shouldFloat(request.requestedAtMs, nowMs)) {
+            val cameraPose = frame.camera.displayOrientedPose
+            val translation = QrLayoutPolicy.spaced(
+                candidate = QrPlacementPolicy.floatingPose(cameraPose).translation,
+                occupied = placements.map { it.anchor.pose.translation },
+                step = QrLayoutPolicy.sideStep(cameraPose.xAxis),
+            )
+            runCatching { session.createAnchor(Pose(translation, floatArrayOf(0f, 0f, 0f, 1f))) }.getOrNull()
         } else {
             null
         }
-        val placed = when {
-            hit != null -> runCatching { hit.createAnchor() }.getOrNull()?.also { onSurface = true }
-            QrPlacementPolicy.shouldFloat(request.requestedAtMs, nowMs) ->
-                runCatching { session.createAnchor(QrPlacementPolicy.floatingPose(frame.camera.displayOrientedPose)) }
-                    .getOrNull()
-                    ?.also { onSurface = false }
-            else -> null
-        }
-        if (placed != null) {
-            anchor = placed
-            pending = null
-            currentActions.onQr(request.raw)
-        }
+        val placed = created ?: return
+        placements.add(PlacedQrModel(placed, request.model, onSurface = hit != null))
+        pending = null
+        currentActions.onQr(request.code.raw)
     }
 
     fun trackImages(frame: Frame, nowMs: Long) {
@@ -171,14 +185,17 @@ internal fun ArSessionView(state: ArExperienceUiState, actions: ArExperienceActi
         onSessionUpdated = { session, frame ->
             val nowMs = SystemClock.elapsedRealtime()
             if (mode == ArMode.QR) {
-                if (anchor == null && pending != null) {
+                if (pending != null) {
                     placeQr(session, frame, nowMs)
-                } else if (anchor == null && currentState.model == null) {
-                    scanner.scan(frame, nowMs) { raw ->
-                        if (ArModels.resolveFromQr(raw) == null) {
-                            currentActions.onQr(raw)
-                        } else if (anchor == null && pending == null) {
-                            pending = QrPlacement(raw, SystemClock.elapsedRealtime())
+                } else if (placements.size < QrLayoutPolicy.MAX_MODELS) {
+                    scanner.scan(frame, nowMs) { codes ->
+                        val placedIds = placements.map { it.model.id }
+                        val known = codes.mapNotNull { code -> currentState.resolveQr(code.raw)?.let { code to it } }
+                        val next = known.firstOrNull { (_, model) -> QrLayoutPolicy.canAdd(placedIds, model.id) }
+                        when {
+                            next != null && pending == null ->
+                                pending = QrPlacement(next.first, next.second, SystemClock.elapsedRealtime())
+                            known.isEmpty() -> currentActions.onQr(codes.first().raw)
                         }
                     }
                 }
@@ -188,36 +205,36 @@ internal fun ArSessionView(state: ArExperienceUiState, actions: ArExperienceActi
         },
     ) {
         val model = state.model
-        if (model != null) {
-            when (mode) {
-                ArMode.MARKER, ArMode.CUBE -> tracked.forEach { image ->
-                    key(image.index) {
-                        val shown = if (mode == ArMode.CUBE) image.index == activeFace else image.index in visibleImages
-                        AugmentedImageNode(
-                            augmentedImage = image,
-                            visibleTrackingMethods = imageMethods,
-                            apply = { visibleCameraTrackingStates = steadyStates },
-                        ) {
-                            if (mode == ArMode.CUBE) {
-                                Node(position = Position(y = -0.025f), scale = Scale(0.45f), isVisible = shown) {
-                                    ModelScene(model, cameraPosition)
-                                }
-                            } else {
-                                Node(position = Position(y = 0.03f), isVisible = shown) {
-                                    ModelScene(model, cameraPosition)
-                                }
-                            }
+        if (mode == ArMode.QR) {
+            val qrScale = if (placements.size > 1) 1f else 1.5f
+            placements.forEach { placed ->
+                key(placed.anchor) {
+                    AnchorNode(
+                        anchor = placed.anchor,
+                        visibleTrackingStates = steadyStates,
+                        apply = { visibleCameraTrackingStates = steadyStates },
+                    ) {
+                        Node(position = Position(y = if (placed.onSurface) 0.06f else 0f), scale = Scale(qrScale)) {
+                            ModelScene(placed.model, cameraPosition)
                         }
                     }
                 }
-                ArMode.QR -> anchor?.let { placed ->
-                    key(placed) {
-                        AnchorNode(
-                            anchor = placed,
-                            visibleTrackingStates = steadyStates,
-                            apply = { visibleCameraTrackingStates = steadyStates },
-                        ) {
-                            Node(position = Position(y = if (onSurface) 0.06f else 0f), scale = Scale(1.5f)) {
+            }
+        } else if (model != null) {
+            tracked.forEach { image ->
+                key(image.index) {
+                    val shown = if (mode == ArMode.CUBE) image.index == activeFace else image.index in visibleImages
+                    AugmentedImageNode(
+                        augmentedImage = image,
+                        visibleTrackingMethods = imageMethods,
+                        apply = { visibleCameraTrackingStates = steadyStates },
+                    ) {
+                        if (mode == ArMode.CUBE) {
+                            Node(position = Position(y = -0.025f), scale = Scale(0.45f), isVisible = shown) {
+                                ModelScene(model, cameraPosition)
+                            }
+                        } else {
+                            Node(position = Position(y = 0.03f), isVisible = shown) {
                                 ModelScene(model, cameraPosition)
                             }
                         }
