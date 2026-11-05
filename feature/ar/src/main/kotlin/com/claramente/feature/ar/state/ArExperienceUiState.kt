@@ -13,6 +13,7 @@ data class ArExperienceUiState(
     val found: Boolean = false,
     val unknownCode: String? = null,
     val failure: String? = null,
+    val trackingHint: String? = null,
     val arWebUrl: String? = null,
     val attempt: Int = 0,
     val available: List<ArModel> = ArModels.all,
@@ -21,6 +22,7 @@ data class ArExperienceUiState(
 
     val stage: ArStage
         get() = when {
+            !mode.usesCamera -> ArStage.RUNNING
             failure != null -> ArStage.FAILED
             support == ArSupport.CHECKING -> ArStage.CHECKING
             support == ArSupport.UNSUPPORTED -> ArStage.UNSUPPORTED
@@ -44,7 +46,7 @@ data class ArExperienceUiState(
             mode == ArMode.QR && qrModels.size >= QrLayoutPolicy.MAX_MODELS ->
                 "Limite de ${QrLayoutPolicy.MAX_MODELS} modelos — toque em Limpar para recomeçar"
             mode == ArMode.QR && model != null ->
-                "Leia outro QR para adicionar · ${qrModels.size} de ${QrLayoutPolicy.MAX_MODELS}"
+                "Leia outro QR para adicionar · ${qrModels.size} de ${QrLayoutPolicy.MAX_MODELS} · arraste para girar"
             mode == ArMode.QR && unknownCode != null -> "QR não reconhecido — use os códigos do app"
             else -> mode.hint
         }

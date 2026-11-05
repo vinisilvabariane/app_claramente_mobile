@@ -47,7 +47,7 @@ internal fun ArLaunchPanel(model: ArModel, webUrl: String?, onStart: (ArMode) ->
                 color = ClaramenteColors.Ink,
                 modifier = Modifier.padding(bottom = 10.dp),
             )
-            ArModePicker(modes = ArMode.entries, selected = mode, onSelect = { mode = it })
+            ArModePicker(modes = ArMode.camera, selected = mode, onSelect = { mode = it })
             Text(
                 mode.hint,
                 style = MaterialTheme.typography.bodySmall,
@@ -59,6 +59,11 @@ internal fun ArLaunchPanel(model: ArModel, webUrl: String?, onStart: (ArMode) ->
             text = if (mode == ArMode.QR) "Ler QR code em AR" else "Abrir câmera",
             onClick = { onStart(mode) },
             modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp),
+        )
+        SecondaryButton(
+            text = "Ver em 3D sem câmera",
+            onClick = { onStart(ArMode.VIEWER) },
+            modifier = Modifier.fillMaxWidth(),
         )
         if (webUrl != null) {
             SecondaryButton(text = "Abrir versão web", onClick = onOpenWeb, modifier = Modifier.fillMaxWidth())

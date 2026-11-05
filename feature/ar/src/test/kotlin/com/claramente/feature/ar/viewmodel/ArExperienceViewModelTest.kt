@@ -2,6 +2,7 @@ package com.claramente.feature.ar.viewmodel
 
 import com.claramente.feature.ar.state.ArMode
 import com.claramente.feature.ar.state.ArModels
+import com.claramente.feature.ar.state.ArStage
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
@@ -45,5 +46,42 @@ class ArExperienceViewModelTest {
         viewModel.onRescan()
         assertEquals(emptyList<Any>(), viewModel.state.value.qrModels)
         assertNull(viewModel.state.value.model)
+    }
+
+    @Test
+    fun viewerRunsWithoutCameraOrArCore() {
+        val viewModel = ArExperienceViewModel(arWebUrl = null).apply { start(ArMode.VIEWER, ArModels.AGUA) }
+        assertEquals(ArStage.RUNNING, viewModel.state.value.stage)
+        assertEquals(ArModels.AGUA, viewModel.state.value.model)
+        assertEquals("Molécula de água", viewModel.state.value.title)
+    }
+
+    @Test
+    fun switchingToTheViewerKeepsTheModelAndClearsTheFailure() {
+        val viewModel = ArExperienceViewModel(arWebUrl = null).apply { start(ArMode.MARKER, ArModels.SOLIDOS) }
+        viewModel.onSessionFailed("sem câmera")
+        assertEquals(ArStage.FAILED, viewModel.state.value.stage)
+        viewModel.onViewer()
+        assertEquals(ArMode.VIEWER, viewModel.state.value.mode)
+        assertEquals(ArModels.SOLIDOS, viewModel.state.value.model)
+        assertNull(viewModel.state.value.failure)
+        assertEquals(ArStage.RUNNING, viewModel.state.value.stage)
+    }
+
+    @Test
+    fun switchingToTheViewerFromQrPicksTheFirstAvailableModel() {
+        val viewModel = ArExperienceViewModel(arWebUrl = null)
+        viewModel.start(ArMode.QR, ArModels.SOLAR, available = listOf(ArModels.AGUA, ArModels.SOLAR))
+        viewModel.onViewer()
+        assertEquals(ArModels.AGUA, viewModel.state.value.model)
+    }
+
+    @Test
+    fun trackingHintsAreKeptUntilTrackingRecovers() {
+        val viewModel = ArExperienceViewModel(arWebUrl = null).apply { start(ArMode.MARKER, ArModels.SOLAR) }
+        viewModel.onTrackingHint("Mova o celular mais devagar")
+        assertEquals("Mova o celular mais devagar", viewModel.state.value.trackingHint)
+        viewModel.onTrackingHint(null)
+        assertNull(viewModel.state.value.trackingHint)
     }
 }

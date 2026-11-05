@@ -34,14 +34,17 @@ internal fun ArBottomBar(state: ArExperienceUiState, actions: ArExperienceAction
             PrimaryButton(text = "Limpar modelos", onClick = actions.onRescan)
         } else {
             val text = when {
+                state.mode == ArMode.VIEWER -> "Toque duas vezes para centralizar"
+                state.trackingHint != null -> state.trackingHint
                 state.mode == ArMode.QR -> "Procurando o QR code..."
                 state.found -> "${state.title} - alvo encontrado"
                 else -> "Procurando o alvo..."
             }
-            val background = if (state.found) {
-                ClaramenteColors.Success.copy(alpha = 0.92f)
-            } else {
-                ClaramenteColors.InkDeep.copy(alpha = 0.82f)
+            val background = when {
+                state.mode == ArMode.VIEWER -> ClaramenteColors.Ink.copy(alpha = 0.72f)
+                state.trackingHint != null -> ClaramenteColors.Warning.copy(alpha = 0.92f)
+                state.found -> ClaramenteColors.Success.copy(alpha = 0.92f)
+                else -> ClaramenteColors.InkDeep.copy(alpha = 0.82f)
             }
             Text(
                 text = text,

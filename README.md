@@ -116,7 +116,7 @@ O papel vem da claim `roles` do JWT e é resolvido por `RolePolicy` (`core:auth`
 | Professor | Turmas (criar, código, alunos, liberar modelos) · Biblioteca (enviar `.glb`, modelos de exemplo) · Perfil |
 
 Não há aba de AR: "Ver em realidade aumentada" (Turma) e "Testar em AR" (Biblioteca) baixam o `.glb`
-(cache em `filesDir/models`, chave = SHA-256) e abrem a `ArLaunchDialog`, que escolhe o modo (marcador, cubo, QR `claramente:<id>`). O modelo é
+(cache em `filesDir/models`, chave = SHA-256) e abrem a `ArLaunchDialog`, que escolhe o modo (marcador, cubo, QR `claramente:<id>` ou "Ver em 3D sem câmera"). O modelo é
 normalizado para 10 cm (`GlbSceneDefaults`). No topo da Turma e da Biblioteca, a `ArScannerSection` ("Ler QR codes")
 baixa todos os modelos da turma/biblioteca (`PrepareModelsUseCase`, um modelo com falha não bloqueia os outros) e abre a
 AR direto no modo QR reconhecendo esses modelos e os de exemplo. Modelos enviados não têm versão web. O modo teste não
@@ -162,14 +162,27 @@ Biblioteca. Tocar num modelo abre a `ArLaunchDialog` (folha inferior), que escol
 |---|---|
 | Marcador | Augmented Images com `app/.../assets/ar/marker.jpg` (12 cm). O modelo aparece sobre a folha impressa. |
 | Cubo | 6 faces (`cube-face-1..6.jpg`, 5 cm). Uma face ativa por vez (`CubeFacePolicy`); o modelo fica no centro do cubo. |
-| QR code | O ML Kit lê o QR dentro da própria sessão ARCore (`QrFrameScanner`). `claramente:<id>` ou o id cru escolhe o modelo, fixado sobre o próprio QR (hit test no centro do QR na superfície detectada) ou, sem superfície, 0,5 m à frente. A leitura continua: outro QR adiciona outro modelo em cima dele (até 4, sem repetir, `QrLayoutPolicy`); com mais de um, a escala cai de 1,5× para 1×. Só os modelos flutuantes são afastados 22 cm entre si. "Limpar modelos" remove todos. |
+| QR code | O ML Kit lê o QR dentro da própria sessão ARCore (`QrFrameScanner`). `claramente:<id>` ou o id cru escolhe o modelo, fixado sobre o próprio QR (`QrPlacementPolicy`: hit test no centro do QR numa superfície detectada — horizontal ou vertical —, depois no ponto de profundidade da Depth API quando o aparelho tem, depois Instant Placement; só depois de 4 s sem nada o modelo fica flutuando 0,5 m à frente). A leitura continua: outro QR adiciona outro modelo em cima dele (até 4, sem repetir, `QrLayoutPolicy`); com mais de um, a escala cai de 1,5× para 1×. Só os modelos flutuantes são afastados 22 cm entre si. "Limpar modelos" remove todos. |
+| Ver em 3D | Sem câmera nem ARCore (`ModelViewerView`): o modelo fica parado num fundo claro e a câmera virtual orbita em volta dele. É a opção oferecida também quando o aparelho não tem ARCore, nega a câmera ou a sessão falha. |
+
+Gestos (`OrbitGestureSurface` + `OrbitTracker`, regras em `OrbitPolicy`): arrastar com um dedo gira o modelo em
+torno do eixo vertical (na AR) ou orbita a câmera (no 3D, onde arrastar para cima/baixo também inclina); juntar
+ou afastar dois dedos aproxima/afasta (0,5× a 3×); soltar com velocidade continua girando com inércia; tocar duas
+vezes recentraliza. Os modelos não giram sozinhos por padrão — o botão "Girar sozinho" no topo liga o giro
+automático, e qualquer toque na cena desliga. Na AR, todos os modelos colocados giram juntos.
+
+Estabilidade na AR: os nós só aparecem enquanto o ARCore está em `TRACKING` (padrão do SceneView, sem exceção
+para `PAUSED`), a pose dos marcadores e das âncoras passa por suavização (`isSmoothTransformEnabled`,
+`ArSceneDefaults.POSE_SMOOTHING_SPEED`), o QR só é ancorado depois de 12 quadros seguidos de rastreamento
+estável (`PlacementReadinessPolicy`) e o motivo de uma perda de rastreamento vira dica na barra de baixo
+("Mova o celular mais devagar", "Pouca luz…", `TrackingHintPolicy`).
 
 Os modelos de exemplo são primitivas 3D (esferas, cubos, cone, texto com billboard) com as medidas do React, sem
 arquivos glTF. Antes de abrir a câmera a tela verifica o ARCore (`ArCoreSupportProbe`): pede a instalação do
-Google Play Services for AR quando falta e, em aparelho sem suporte, oferece a versão web (botão "Abrir
-versão web", que usa `CLARAMENTE_AR_WEB_URL`). O manifest declara a AR como opcional, então o app instala em
-qualquer aparelho. Os alvos do marcador e do cubo são montados em tempo de execução a partir dos JPEG de
-`assets/ar/` (convertidos dos PNG do React). O release leva só `arm64-v8a` para reduzir o tamanho.
+Google Play Services for AR quando falta e, em aparelho sem suporte, oferece o 3D sem câmera e a versão web
+(botão "Abrir versão web", que usa `CLARAMENTE_AR_WEB_URL`). O manifest declara a AR como opcional, então o app
+instala em qualquer aparelho. Os alvos do marcador e do cubo são montados em tempo de execução a partir dos JPEG
+de `assets/ar/` (convertidos dos PNG do React). O release leva só `arm64-v8a` para reduzir o tamanho.
 
 ### Realidade aumentada (versão web)
 

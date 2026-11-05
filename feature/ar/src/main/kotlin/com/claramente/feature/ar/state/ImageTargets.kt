@@ -14,6 +14,6 @@ object ImageTargets {
     fun forMode(mode: ArMode): List<ImageTarget> = when (mode) {
         ArMode.MARKER -> listOf(marker)
         ArMode.CUBE -> cubeFaces
-        ArMode.QR -> emptyList()
+        ArMode.QR, ArMode.VIEWER -> emptyList()
     }
 }

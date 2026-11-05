@@ -5,6 +5,7 @@ import com.claramente.core.designsystem.theme.ClaramenteRadius
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,7 +25,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-internal fun ArOverlay(title: String, hint: String, onBack: () -> Unit, modifier: Modifier = Modifier) {
+internal fun ArOverlay(
+    title: String,
+    hint: String,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier,
+    trailing: (@Composable () -> Unit)? = null,
+) {
     Row(
         modifier = modifier
             .statusBarsPadding()
@@ -33,7 +40,7 @@ internal fun ArOverlay(title: String, hint: String, onBack: () -> Unit, modifier
             .clip(RoundedCornerShape(ClaramenteRadius.Lg))
             .background(ClaramenteColors.Overlay)
             .padding(12.dp),
-        horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
@@ -67,5 +74,6 @@ internal fun ArOverlay(title: String, hint: String, onBack: () -> Unit, modifier
                 modifier = Modifier.padding(top = 1.dp),
             )
         }
+        trailing?.invoke()
     }
 }

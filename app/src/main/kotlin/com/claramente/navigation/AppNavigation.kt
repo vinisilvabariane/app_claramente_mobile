@@ -97,7 +97,9 @@ fun AppNavigation(
                         onQr = arExperienceViewModel::onQr,
                         onRescan = arExperienceViewModel::onRescan,
                         onSessionFailed = arExperienceViewModel::onSessionFailed,
+                        onTrackingHint = arExperienceViewModel::onTrackingHint,
                         onRetry = arExperienceViewModel::onRetry,
+                        onViewer = arExperienceViewModel::onViewer,
                         onOpenWeb = { experience.webUrl?.let(onOpenUrl) },
                     ),
                 )

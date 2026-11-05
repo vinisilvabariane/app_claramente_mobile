@@ -1,6 +1,7 @@
 package com.claramente.feature.ar.component
 
 import com.claramente.core.designsystem.component.PrimaryButton
+import com.claramente.core.designsystem.component.SecondaryButton
 import com.claramente.core.designsystem.theme.ClaramenteColors
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -25,6 +26,8 @@ internal fun ArMessageCard(
     modifier: Modifier = Modifier,
     primaryLabel: String? = null,
     onPrimary: () -> Unit = {},
+    viewerLabel: String? = null,
+    onViewer: () -> Unit = {},
     secondaryLabel: String? = null,
     onSecondary: () -> Unit = {},
 ) {
@@ -51,6 +54,9 @@ internal fun ArMessageCard(
         )
         if (primaryLabel != null) {
             PrimaryButton(text = primaryLabel, onClick = onPrimary)
+        }
+        if (viewerLabel != null) {
+            SecondaryButton(text = viewerLabel, onClick = onViewer)
         }
         if (secondaryLabel != null) {
             TextButton(onClick = onSecondary) {

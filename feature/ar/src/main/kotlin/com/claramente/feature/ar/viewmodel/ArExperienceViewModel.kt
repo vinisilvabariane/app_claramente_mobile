@@ -61,7 +61,23 @@ class ArExperienceViewModel(arWebUrl: String?) : ViewModel() {
         _state.update { it.copy(failure = message ?: "Falha desconhecida ao iniciar a câmera de AR.") }
     }
 
+    fun onTrackingHint(hint: String?) {
+        _state.update { if (it.trackingHint == hint) it else it.copy(trackingHint = hint) }
+    }
+
     fun onRetry() {
         _state.update { it.copy(failure = null, support = ArSupport.CHECKING, cameraGranted = null, attempt = it.attempt + 1) }
+    }
+
+    fun onViewer() {
+        _state.update {
+            it.copy(
+                mode = ArMode.VIEWER,
+                model = it.model ?: it.available.firstOrNull() ?: ArModels.default,
+                failure = null,
+                trackingHint = null,
+                found = false,
+            )
+        }
     }
 }

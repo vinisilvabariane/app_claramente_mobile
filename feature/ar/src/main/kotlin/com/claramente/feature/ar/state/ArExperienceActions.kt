@@ -9,6 +9,8 @@ data class ArExperienceActions(
     val onQr: (String) -> Unit,
     val onRescan: () -> Unit,
     val onSessionFailed: (String?) -> Unit,
+    val onTrackingHint: (String?) -> Unit,
     val onRetry: () -> Unit,
+    val onViewer: () -> Unit,
     val onOpenWeb: () -> Unit,
 )
